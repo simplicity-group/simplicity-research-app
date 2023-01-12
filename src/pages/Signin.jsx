@@ -23,8 +23,8 @@ const Signin = () => {
   }
 
   return (
-    <div class="flex h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div class="w-full max-w-md space-y-8">
+    <div class="bg-gray-50 flex h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div class="bg-white p-4 w-full max-w-md space-y-8 rounded-md shadow-md border border-gray-400 rounded-md">
         <div>
           <img class="mx-auto h-16 w-auto" src={logo} alt="Your Company"/>
           <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>

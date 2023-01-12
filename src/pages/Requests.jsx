@@ -6,7 +6,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
 import requestsData from '../data/requestsData';
 import filters from '../data/requestsFilters';
-import { NavLink, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Requests = () => {
 
@@ -84,8 +84,8 @@ const Requests = () => {
     console.log(filters)
   };
 
-  function selectReport(report){
-    localStorage.setItem("currentReport", JSON.stringify(report));
+  function selectRequest(request){
+    localStorage.setItem("selectedRequest", JSON.stringify(request));
   }
   
   return (
@@ -319,7 +319,7 @@ const Requests = () => {
             <div className='flex-1 p-6 '>
               <div class="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   {requestsData.slice(0, visible).map(request => (
-                    <div onClick={() => selectReport(request)}>
+                    <div onClick={() => selectRequest(request)}>
                       <RequestCard 
                         id={request.id}
                         name={request.name} 

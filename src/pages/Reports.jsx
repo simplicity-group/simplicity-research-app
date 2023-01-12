@@ -84,7 +84,7 @@ const Reports = () => {
   };
 
   function selectReport(report){
-    localStorage.setItem("currentReport", JSON.stringify(report));
+    localStorage.setItem("selectedReport", JSON.stringify(report));
   }
   
   return (

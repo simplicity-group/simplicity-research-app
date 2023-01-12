@@ -1,10 +1,10 @@
 import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import ReportThumbnail from '../components/reports/ReportThumbnail'
 
 const Home = () => {
   return (
-    <div className="bg-gray-100 h-full justify-center items-center grid grid-cols-1 gap-x-4 mt-10 sm:mt-10 sm:mb-auto sm:px-6 md:mt-10 md:mb-auto lg:mt-auto lg:mb-auto lg:grid-cols-3 lg:px-8">
+    <div className="bg-gray-100 h-full justify-center items-center grid grid-cols-1 gap-x-4 pt-10 sm:pt-10 sm:mb-auto sm:px-6 md:pt-10 md:mb-auto lg:mt-auto lg:mb-auto lg:grid-cols-3 lg:px-8">
       <div className='pl-4 pr-4 mb-10 col-span-3 sm:mb-10 lg:col-span-2'>
         <div className='pb-16'>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -16,9 +16,9 @@ const Home = () => {
         </div>
 
         <dl className="grid grid-cols-1 sm:grid-cols-1 gap-y-8 lg:gap-x-4">
-          <NavLink 
+          <Link 
             to="/newrequest"
-            className="bg-white relative flex flex-row gap-6 border border-gray-400 rounded-lg p-6 hover:shadow-md">
+            className="bg-white relative flex flex-row gap-6 border border-gray-400 rounded-md p-6 hover:shadow-md">
               <div className="flex grow-0 h-8 w-8 p-1 rounded-md bg-black text-white items-center justify-center sm:h-12 sm:w-12 sm:rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-plus" width="32" height="32" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -30,11 +30,11 @@ const Home = () => {
                 <p className="text-lg font-semibold text-gray-900">Request a new Report</p>
                 <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
               </div>
-          </NavLink>
+          </Link>
 
-          <NavLink 
+          <Link 
             to="/requests"
-            className="bg-white relative flex flex-row gap-6 border border-gray-400 rounded-lg p-6 hover:shadow-md">
+            className="bg-white relative flex flex-row gap-6 border border-gray-400 rounded-md p-6 hover:shadow-md">
               <div className="flex grow-0 h-8 w-8 p-1 rounded-md bg-black text-white items-center justify-center sm:h-12 sm:w-12 sm:rounded-xl">
               <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-clipboard-check" width="32" height="32" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -47,11 +47,11 @@ const Home = () => {
                 <p className="text-lg font-semibold text-gray-900">Check status of a Report</p>
                 <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
               </div>
-          </NavLink>
+          </Link>
 
-          <NavLink 
+          <Link 
             to="/reports"
-            className="bg-white relative flex flex-row gap-6 border border-gray-400 rounded-lg p-6 hover:shadow-md">
+            className="bg-white relative flex flex-row gap-6 border border-gray-400 rounded-md p-6 hover:shadow-md">
               <div className="flex grow-0 h-8 w-8 p-1 rounded-md bg-black text-white items-center justify-center sm:h-12 sm:w-12 sm:rounded-xl">
               <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-report-search" width="32" height="32" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -68,12 +68,12 @@ const Home = () => {
                 <p className="text-lg font-semibold text-gray-900">Browse Popular Reports</p>
                 <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
               </div>
-          </NavLink>
+          </Link>
         </dl>
       </div>
 
       <div className='pl-4 pr-4 mb-8 sm:mb-6 md:mb-8 lg:m-0 col-span-3 lg:col-span-1'>
-        <div className='sm:m-0 bg-white border border-gray-400 rounded-lg shadow-md'>
+        <div className='sm:m-0 bg-white border border-gray-400 rounded-sm shadow-md'>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl mb-4 ml-6 mt-4">Popular Reports</h2>
           <div className='ml-4 mr-4 mb-8'>
             <div className="grid grid-cols-1 grid-rows-3 gap-2 sm:gap-4 lg:gap-6 m-4 ">

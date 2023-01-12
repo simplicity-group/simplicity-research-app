@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 
 const ReportThumbnail = () => {
   return (
-    <NavLink className="overflow-hidden bg-white shadow-sm rounded-lg border border-gray-300 hover:shadow-md hover:border-gray-400">
+    <NavLink className="overflow-hidden bg-white shadow-sm rounded-md border border-gray-300 hover:shadow-md hover:border-gray-400">
       <div className="px-4 py-3 sm:px-6">
         <h3 className="text-lg font-medium leading-6 text-gray-900">Betterverse</h3>
       </div>

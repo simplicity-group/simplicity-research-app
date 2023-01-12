@@ -32,7 +32,9 @@ export default function Navbar() {
     }
   }, [user])
 
-  if (window.location.pathname === '/' || ''){
+  console.log(user)
+
+  if (!user){
     return null
   } else {
     return (

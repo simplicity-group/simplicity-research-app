@@ -3,9 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
 import { useAuth, upload } from '../firebase';
 import { useEffect } from 'react';
-import Select from 'react-select';
+import FixRequiredSelect from '../components/general/FixRequiredSelect';
+import BaseSelect from 'react-select';
 
-const Account = () => {
+const Select = props => (
+    <FixRequiredSelect
+      {...props}
+      SelectComponent={BaseSelect}
+      options={props.options || options}
+    />
+);
+
+
+const AccountSetup = () => {
 
   const {user, logout} = UserAuth();
   const navigate = useNavigate();
@@ -78,7 +88,7 @@ const Account = () => {
           <form className='bg-white rounded-md'>
             <div className="shadow-md border border-gray-400 rounded-md">
               <div className='border-b border-gray p-3 '>
-                  <h2 class="text-2xl font-bold tracking-tight text-gray-900  ml-3">My Profile</h2>
+                  <h2 class="text-2xl font-bold tracking-tight text-gray-900  ml-3">Account Setup</h2>
               </div>
               <div className="space-y-6  px-4 py-5 sm:p-6">
                 <div>
@@ -94,19 +104,20 @@ const Account = () => {
                       onChange={providePhoto}
                       ref={hiddenFileInput}
                     />
-                    <label htmlFor="contained-button-file">
-                      <button className='ml-4 text-sm pl-6 pr-6 pt-2 pb-2 bg-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400'
-                        onClick={clickProvidePhotoInput}>
-                        Change
-                      </button>
-                    </label>
+                    <button 
+                    disabled={true}
+                    className='ml-4 text-sm pl-6 pr-6 pt-2 pb-2 bg-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400'
+                    onClick={clickProvidePhotoInput}>
+                    Change
+                    </button>
                   </div>
                 </div>
-                <div className="">
+                <div className="form-group">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Stage Interest
                   </label>
                   <Select 
+                    required
                     isMulti
                     placeholder="Select Stage(s)"
                     value={selectedStages} 
@@ -114,11 +125,12 @@ const Account = () => {
                     onChange={handleStagesChange}
                   />
                 </div>
-                <div className="">
+                <div className="form-group">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Sectors Interest
                   </label>
                   <Select
+                    required
                     isMulti
                     placeholder="Select Sector(s)"
                     value={selectedSectors} 
@@ -127,17 +139,12 @@ const Account = () => {
                   />
                 </div>
                 <div className="pt-3 flex justify-between items-center">
-                  <div className='flex-1'>
-                    <button onClick={handleLogout} 
-                    className='text-sm pl-8 pr-8 pt-2 pb-2 bg-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400'>                    
-                      Logout
-                    </button>
-                  </div>
                   <div className='flex-1 flex justify-end'>
-                    <button type="submit" className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900"
-                      disabled={loading || !photo}
-                      onClick={uploadPhoto}>
-                      Save
+                    <button
+                        className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:bg-gray-200 disabled:text-gray-400 disabled:hover:shadow-none disabled:cursor-not-allowed"
+                        type="submit" 
+                        disabled={!selectedStages && !selectedSectors}
+                      >Complete Account
                     </button>
                   </div>
                 </div>
@@ -153,4 +160,4 @@ const Account = () => {
   )
 }
 
-export default Account
+export default AccountSetup
