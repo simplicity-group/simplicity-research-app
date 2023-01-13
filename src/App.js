@@ -39,12 +39,13 @@ function App() {
                   <AccountSetup />
                 </ProtectedRoute>
               } />
+              
+              <ProtectedRoute>
+                <Route path='/home' element={
+                      <Home  />
+                } />
+              </ProtectedRoute>
 
-              <Route path='/home' element={
-                <ProtectedRoute>
-                    <Home  />
-                </ProtectedRoute>
-              } />
 
               <Route path='/account' element={
                 <ProtectedRoute>
