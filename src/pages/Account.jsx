@@ -78,7 +78,7 @@ const Account = () => {
           <form className='bg-white rounded-md'>
             <div className="shadow-md border border-gray-400 rounded-md">
               <div className='border-b border-gray p-3 '>
-                  <h2 class="text-2xl font-bold tracking-tight text-gray-900  ml-3">My Profile</h2>
+                  <h2 className="text-2xl font-bold tracking-tight text-gray-900  ml-3">My Profile</h2>
               </div>
               <div className="space-y-6  px-4 py-5 sm:p-6">
                 <div>

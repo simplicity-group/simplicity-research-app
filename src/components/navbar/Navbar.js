@@ -32,7 +32,6 @@ export default function Navbar() {
     }
   }, [user])
 
-  console.log(user)
 
   if (!user){
     return null
