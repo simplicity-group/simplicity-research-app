@@ -128,7 +128,9 @@ const Account = () => {
                 </div>
                 <div className="pt-3 flex justify-between items-center">
                   <div className='flex-1'>
-                    <button onClick={handleLogout} 
+                    <button 
+                    type="button"
+                    onClick={handleLogout} 
                     className='text-sm pl-8 pr-8 pt-2 pb-2 bg-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400'>                    
                       Logout
                     </button>
