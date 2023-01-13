@@ -40,11 +40,11 @@ function App() {
                 </ProtectedRoute>
               } />
               
-              <ProtectedRoute>
                 <Route path='/home' element={
-                      <Home  />
+                  <ProtectedRoute>
+                    <Home  />
+                  </ProtectedRoute>
                 } />
-              </ProtectedRoute>
 
 
               <Route path='/account' element={
