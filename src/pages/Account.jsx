@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import Select from 'react-select';
 
 const Account = () => {
-
+  
   const {user, logout} = UserAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -40,6 +40,7 @@ const Account = () => {
   }
 
   useEffect(() => {
+    console.log(user)
     if(user?.photoURL) {
       console.log(user.photoURL)
       setPhotoURL(user.photoURL)
