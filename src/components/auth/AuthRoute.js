@@ -6,6 +6,8 @@ const AuthRoute = ({children}) => {
     const {user} = UserAuth();
 
     if (user) {
+      console.log(user)
+      console.log('redirecting to home')
         return <Navigate to='/home' />
     }
 

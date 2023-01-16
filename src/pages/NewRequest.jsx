@@ -78,12 +78,12 @@ const NewRequest = () => {
           <form className='bg-white rounded-md'>
             <div className="shadow-md border border-gray-400 rounded-md">
               <div className='border-b border-gray p-3 '>
-                  <h2 class="text-2xl font-bold tracking-tight text-gray-900  ml-3">New Request</h2>
+                  <h2 className="text-2xl font-bold tracking-tight text-gray-900  ml-3">New Request</h2>
               </div>
               <div className="space-y-6  px-4 py-5 sm:p-6">
                 <div className=''>
                   <label className="block text-sm font-medium text-gray-700">Name of Project</label>
-                  <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 sm:text-sm"/>
+                  <input type="text" name="first-name" id="first-name" autoComplete="given-name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 sm:text-sm"/>
                 </div>
                 <div className="">
                   <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
@@ -106,7 +106,7 @@ const NewRequest = () => {
                   <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
                     Pitch Deck
                   </label>    
-                  <input class="form-control
+                  <input className="form-control
                     block
                     w-full
                     shadow-sm
@@ -126,7 +126,7 @@ const NewRequest = () => {
                   <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
                     White Paper
                   </label>    
-                  <input class="form-control
+                  <input className="form-control
                     block
                     w-full
                     shadow-sm

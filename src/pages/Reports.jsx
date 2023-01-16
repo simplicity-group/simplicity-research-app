@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react'
 import ReportCard from '../components/reports/ReportCard';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
+import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
 import reportsData from '../data/reportsData';
 import filters from '../data/reportsFilters';
 
@@ -277,11 +277,11 @@ const Reports = () => {
           </div> 
 
           {/* Report grid */}
-          <div class="flex-1 flex bg-gray-100">
+          <div className="flex-1 flex bg-gray-100">
             <div className='flex-1 p-6 '>
-              <div class="grid gap-6 mb-6 grid-cols-1 md:grid-cols-1 lg:grid-cols-2 ">
+              <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-1 lg:grid-cols-2 ">
                   {reportsData.slice(0, visible).map(report => (
-                    <div onClick={() => selectReport(report)}>
+                    <div key={report.id} onClick={() => selectReport(report)}>
                       <ReportCard 
                         id={report.id}
                         name={report.name} 

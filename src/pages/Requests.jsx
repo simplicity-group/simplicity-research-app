@@ -315,11 +315,11 @@ const Requests = () => {
           </div> 
 
           {/* Report grid */}
-          <div class="flex-1 flex bg-gray-100">
+          <div className="flex-1 flex bg-gray-100">
             <div className='flex-1 p-6 '>
-              <div class="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   {requestsData.slice(0, visible).map(request => (
-                    <div onClick={() => selectRequest(request)}>
+                    <div key={request.id} onClick={() => selectRequest(request)}>
                       <RequestCard 
                         id={request.id}
                         name={request.name} 

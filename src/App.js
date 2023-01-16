@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes, Switch } from "react-router-dom";
 
 import Navbar from "./components/navbar/Navbar";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -19,6 +19,8 @@ import { AuthContextProvider } from "./context/AuthContext";
 
 function App() {
 
+
+
   return (
     <div className="flex flex-col h-screen">
       <AuthContextProvider>
@@ -27,6 +29,7 @@ function App() {
         </div>
 
         <div className="flex-1">
+         
           <Routes>
               <Route path='/' element={
                 <AuthRoute>
@@ -81,6 +84,12 @@ function App() {
                   <SpecificReport />
                 </ProtectedRoute>
               } />
+
+              <Route
+                path="*"
+                element={<Navigate to="/" Signin />}
+              />
+
           </Routes>
         </div> 
       </AuthContextProvider>
