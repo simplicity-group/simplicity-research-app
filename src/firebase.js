@@ -2,6 +2,7 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, updateProfile} from "firebase/auth";
 import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
+import { getFirestore } from 'firebase/firestore';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -20,19 +21,16 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const storage = getStorage();
+export const db = getFirestore(app);
 
 export const auth = getAuth(app);
 
-export async function upload(file, currentUser, setLoading) {
+export async function upload(file, currentUser) {
     const fileRef = ref(storage, currentUser.uid);
-    setLoading(true);
     const snapshot = await uploadBytes(fileRef, file);
     const photoURL = await getDownloadURL(fileRef);
     updateProfile(currentUser, {photoURL})
-
-    setLoading(false);
-    alert('uploaded');
-
+    return photoURL
 }
 
 export default app

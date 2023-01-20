@@ -1,10 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { UserAuth } from '../../context/AuthContext';
+import { AuthContextProvider, UserAuth } from '../../context/AuthContext';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../images/sr_logo.svg'
-
 
 const navigation = [
   { name: 'Reports', href: '/reports', current: false },
@@ -16,7 +15,7 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
-  const {user} = UserAuth();
+  const {user, userComplete, profilePic} = UserAuth();
   const activeLogoNavbarLink = 'border-b-2 border-black text-black px-4 py-4 h-full text-sm font-medium'
   const activeNavbarLink = 'border-b-2 border-black text-black px-4 py-5 h-full text-base font-medium'
   const normalNavbarLink = 'text-gray-600 hover:text-black px-4 py-5 rounded-md text-base font-sm'
@@ -25,15 +24,7 @@ export default function Navbar() {
   const acitveProfileLink = 'flex align-middle pl-2 pr-2 h-full flex justify-center items-center border-b-2 border-black'
   const normalProfileLink = 'flex align-middle pl-2 pr-2 h-full flex justify-center items-center'
 
-  const [photoURL, setPhotoURL] = useState("https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png");
-  useEffect(() => {
-    if(user?.photoURL) {
-      setPhotoURL(user.photoURL)
-    }
-  }, [user])
-
-
-  if (!user){
+  if (!user || userComplete === false ){
     return null
   } else {
     return (
@@ -106,7 +97,7 @@ export default function Navbar() {
                         >
                         <img
                           className="h-8 w-8 rounded-full"
-                          src={photoURL}
+                          src={profilePic}
                           alt=""
                         />                      
                       </NavLink>

@@ -5,9 +5,13 @@ import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
 import reportsData from '../data/reportsData';
-import filters from '../data/reportsFilters';
+import filters from '../data/filters';
 
 const Reports = () => {
+  localStorage.setItem("reportFilters", JSON.stringify(filters));
+
+  var reportFilters = JSON.parse(localStorage.getItem("reportFilters"));
+  reportFilters.pop(1) 
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [visible, setVisible] = useState(8);
@@ -20,11 +24,11 @@ const Reports = () => {
 
   const unselectAll = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < reportFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-' + i + '-' + f
-        filters[i].options[f].checked = false;
+      for (f = 0; f < reportFilters[i].options.length; f++){
+        let checkboxId = 'report-filter-' + i + '-' + f
+        reportFilters[i].options[f].checked = false;
         document.getElementById(checkboxId).checked = false;
       }
     }
@@ -33,11 +37,11 @@ const Reports = () => {
 
   const unselectAllMobile = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < reportFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-mobile-' + i + '-' + f
-        filters[i].options[f].checked = false;
+      for (f = 0; f < reportFilters[i].options.length; f++){
+        let checkboxId = 'report-filter-mobile-' + i + '-' + f
+        reportFilters[i].options[f].checked = false;
         document.getElementById(checkboxId).checked = false;
       }
     }
@@ -46,11 +50,11 @@ const Reports = () => {
 
   const selectAll = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < reportFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-' + i + '-' + f
-        filters[i].options[f].checked = true;
+      for (f = 0; f < reportFilters[i].options.length; f++){
+        let checkboxId = 'report-filter-' + i + '-' + f
+        reportFilters[i].options[f].checked = true;
         document.getElementById(checkboxId).checked = true;
       }
     }
@@ -59,11 +63,11 @@ const Reports = () => {
 
   const selectAllMobile = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < reportFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-mobile-' + i + '-' + f
-        filters[i].options[f].checked = true;
+      for (f = 0; f < reportFilters[i].options.length; f++){
+        let checkboxId = 'report-filter-mobile-' + i + '-' + f
+        reportFilters[i].options[f].checked = true;
         document.getElementById(checkboxId).checked = true;
       }
     }
@@ -73,14 +77,14 @@ const Reports = () => {
   const handleFilterChange = (e) => {
     let filterId = e.target.id;
     const selectedFilter = filterId.split('-');
-    filters[selectedFilter[1]].options[selectedFilter[2]].checked = e.target.checked
-    console.log(filters[selectedFilter[1]].options[selectedFilter[2]])
+    reportFilters[selectedFilter[1]].options[selectedFilter[2]].checked = e.target.checked
+    console.log(reportFilters[selectedFilter[1]].options[selectedFilter[2]])
     filterReports();
   };
 
   const filterReports = () => {
     console.log('Searching with new filter...')
-    console.log(filters)
+    console.log(reportFilters)
   };
 
   function selectReport(report){
@@ -143,7 +147,7 @@ const Reports = () => {
                   </button>
                 <form className="mt-4 border-t border-gray-200">
 
-                  {filters.map((section) => (
+                  {reportFilters.map((section) => (
                     <Disclosure defaultOpen as="div" key={section.id} className="border-t border-gray-200 px-4 py-4">
                       {({ open }) => (
                         <>
@@ -164,7 +168,7 @@ const Reports = () => {
                               {section.options.map((option, optionIdx) => (
                                 <div key={option.value} className="flex items-center">
                                   <input
-                                    id={`filter-mobile-${section.id}-${optionIdx}`}
+                                    id={`report-filter-mobile-${section.id}-${optionIdx}`}
                                     name={`${section.id}[]`}
                                     defaultValue={option.value}
                                     type="checkbox"
@@ -214,7 +218,7 @@ const Reports = () => {
         <div className="flex h-full">
           
           {/* Main filter panel */}
-          <div className='hidden flex flex-row h-screen sticky top-0 p-3 md:p-6 md:flex-col md:flex-none md:border-r  md:block lg:block lg:p-6 lg:flex-col lg:flex-none lg:border-r lg:border-gray-300'>
+          <div className='hidden flex flex-row h-screen overflow-y-visible sticky top-0 p-3 md:p-6 md:flex-col md:flex-none md:border-r md:block lg:block lg:p-6 lg:flex-col lg:flex-none lg:border-r lg:border-gray-300'>
             <div className='mb-2'>
               <button 
                 className='w-full text-sm pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
@@ -230,7 +234,7 @@ const Reports = () => {
               </button>
             </div>
             <form className="">
-              {filters.map((section) => (
+              {reportFilters.map((section) => (
                 <Disclosure defaultOpen as="div" key={section.id} className="border-b border-gray-200 py-5">
                   {({ open }) => (
                     <>
@@ -251,7 +255,7 @@ const Reports = () => {
                           {section.options.map((option, optionIdx) => (
                             <div key={option.value} className="flex items-center">
                               <input
-                                id={`filter-${section.id}-${optionIdx}`}
+                                id={`report-filter-${section.id}-${optionIdx}`}
                                 name={`${section.id}[]`}
                                 defaultValue={option.value}
                                 type="checkbox"
@@ -260,7 +264,7 @@ const Reports = () => {
                                 onChange={handleFilterChange}
                               />
                               <label
-                                htmlFor={`filter-${section.id}-${optionIdx}`}
+                                htmlFor={`report-filter-${section.id}-${optionIdx}`}
                                 className="ml-3 text-sm text-gray-600"
                               >
                                 {option.label}

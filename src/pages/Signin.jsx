@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { UserAuth } from '../context/AuthContext'
 import logo from '../images/sr_logo.svg'
 
 const Signin = () => {
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate();
-  const {signIn} = UserAuth();
+  const {signIn, profileComplete} = UserAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('')
     try {
       await signIn(email, password);
-      navigate('/home');
     } catch (e) {
       setError(e.message)
       console.log(e.message)
@@ -26,7 +26,7 @@ const Signin = () => {
     <div className="bg-gray-50 flex h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="bg-white p-4 w-full max-w-md space-y-8 rounded-md shadow-md border border-gray-400 rounded-md">
         <div>
-          <img className="mx-auto h-16 w-auto" src={logo} alt="Your Company"/>
+          <img className="mx-auto h-16 w-auto mt-6" src={logo} alt="SR"/>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

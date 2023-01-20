@@ -1,7 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Navigate, Route, Routes, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/navbar/Navbar";
+
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthRoute from "./components/auth/AuthRoute";
 
@@ -16,14 +17,14 @@ import SpecificRequest from "./pages/SpecificRequest";
 import AccountSetup from "./pages/AccountSetup";
 
 import { AuthContextProvider } from "./context/AuthContext";
+import CompleteRoute from "./components/auth/CompleteRoute";
 
 function App() {
-
-
 
   return (
     <div className="flex flex-col h-screen">
       <AuthContextProvider>
+
         <div className="z-10">
           {<Navbar />}
         </div>
@@ -38,12 +39,12 @@ function App() {
               } />
               
               <Route path='/accountsetup' element={
-                <ProtectedRoute>
+                <CompleteRoute>
                   <AccountSetup />
-                </ProtectedRoute>
+                </CompleteRoute>
               } />
 
-              <Route path='/home' element={
+              <Route exact path='/home' element={
                 <ProtectedRoute>      
                   <Home />
                 </ProtectedRoute>

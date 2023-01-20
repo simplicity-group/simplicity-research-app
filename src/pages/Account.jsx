@@ -1,21 +1,37 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
 import { useAuth, upload } from '../firebase';
 import { useEffect } from 'react';
 import Select from 'react-select';
+import filters from '../data/filters';
 
 const Account = () => {
-  
-  const {user, logout} = UserAuth();
+
+  const {user, logout, profile, profilePic, changeProfilePic} = UserAuth();
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
-  const [photoURL, setPhotoURL] = useState("https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png");
+
+  const [selectedSectors, setSelectedSectors] = useState(null);
+  localStorage.setItem("sectorOptions", JSON.stringify(filters[0].options));
+  const sectorOptions = JSON.parse(localStorage.getItem("sectorOptions"));;
+  for (var i = 0; i < sectorOptions.length; i++){
+    delete sectorOptions[i].checked;
+  }
+
+  const [selectedStages, setSelectedStages] = useState(null);
+  localStorage.setItem("stageOptions", JSON.stringify(filters[2].options));
+  const stageOptions = JSON.parse(localStorage.getItem("stageOptions"));;
+  for (var i = 0; i < stageOptions.length; i++){
+    delete stageOptions[i].checked;
+  }
 
   const hiddenFileInput = React.useRef(null);
 
   const clickProvidePhotoInput = event => {
+    event.preventDefault();
     hiddenFileInput.current.click();
   }
 
@@ -25,53 +41,27 @@ const Account = () => {
     }
   }
 
-  function uploadPhoto() {
-      upload(photo, user, setLoading)
+  async function uploadPhoto() {
+    const photoURL = await upload(photo, user, loading);
+    changeProfilePicture(photoURL)
   }
 
   const handleLogout = async () => {
     try {
       await logout();
       navigate('');
-      console.log('You are logged out')
     } catch (e) {
       console.log(e.message)
     }
   }
 
-  useEffect(() => {
-    console.log(user)
-    if(user?.photoURL) {
-      console.log(user.photoURL)
-      setPhotoURL(user.photoURL)
-    }
-  }, [user])
-
-  const [selectedSectors, setSelectedSectors] = useState(null);
   // handle onChange event of the dropdown
   const handleSectorsChange = e => {
     setSelectedSectors(e);
   }
-  const sectorOptions  = [
-    { label:  'Infrastructure - L1s, L2s, Bridges', value:  'option_1'  },
-    { label:  'Infrastructure - DEXs, Oracles', value:  'option_2'  },
-    { label:  'GameFi', value:  'option_3'  },
-    { label:  'NFTs', value:  'option_4'  },
-    { label:  'Real World', value:  'option_5'  },
-    { label:  'DeFi', value:  'option_6'  },
-  ]
-
-  const [selectedStages, setSelectedStages] = useState(null);
   const handleStagesChange = e => {
     setSelectedStages(e);
   }
-  const stageOptions  = [
-    { label:  'Pre-Seed', value:  'option_1'  },
-    { label:  'Seed', value:  'option_2'  },
-    { label:  'Series A', value:  'option_3'  },
-    { label:  'Series B', value:  'option_4'  },
-    { label:  'Series C', value:  'option_5'  },
-  ]
 
   return (
     <div className="bg-gray-100 h-full">
@@ -86,7 +76,7 @@ const Account = () => {
                   <label className="block text-sm font-medium text-gray-700">Photo</label>
                   <div className="mt-1 flex items-center">
                     <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
-                      <img src={photoURL} alt="Avatar"/>
+                      <img src={profilePic} alt="Avatar"/>
                     </span>
                     <input
                       type="file"

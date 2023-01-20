@@ -5,7 +5,7 @@ import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
 import requestsData from '../data/requestsData';
-import filters from '../data/requestsFilters';
+import filters from '../data/filters';
 import { Link } from 'react-router-dom';
 
 const Requests = () => {
@@ -24,7 +24,7 @@ const Requests = () => {
     for (i = 0; i < filters.length; i++){
       let f = 0;
       for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-' + i + '-' + f
+        let checkboxId = 'reqeust-filter-' + i + '-' + f
         filters[i].options[f].checked = false;
         document.getElementById(checkboxId).checked = false;
       }
@@ -37,7 +37,7 @@ const Requests = () => {
     for (i = 0; i < filters.length; i++){
       let f = 0;
       for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-mobile-' + i + '-' + f
+        let checkboxId = 'reqeust-filter-mobile-' + i + '-' + f
         filters[i].options[f].checked = false;
         document.getElementById(checkboxId).checked = false;
       }
@@ -50,7 +50,7 @@ const Requests = () => {
     for (i = 0; i < filters.length; i++){
       let f = 0;
       for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-' + i + '-' + f
+        let checkboxId = 'reqeust-filter-' + i + '-' + f
         filters[i].options[f].checked = true;
         document.getElementById(checkboxId).checked = true;
       }
@@ -63,7 +63,7 @@ const Requests = () => {
     for (i = 0; i < filters.length; i++){
       let f = 0;
       for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'filter-mobile-' + i + '-' + f
+        let checkboxId = 'reqeust-filter-mobile-' + i + '-' + f
         filters[i].options[f].checked = true;
         document.getElementById(checkboxId).checked = true;
       }
@@ -182,7 +182,7 @@ const Requests = () => {
                               {section.options.map((option, optionIdx) => (
                                 <div key={option.value} className="flex items-center">
                                   <input
-                                    id={`filter-mobile-${section.id}-${optionIdx}`}
+                                    id={`reqeust-filter-mobile-${section.id}-${optionIdx}`}
                                     name={`${section.id}[]`}
                                     defaultValue={option.value}
                                     type="checkbox"
@@ -250,7 +250,7 @@ const Requests = () => {
                 </div>  
               </Link>
             </div>
-            <div className='p-3 h-screen sticky top-0 md:p-6'>
+            <div className='p-3 h-screen overflow-y-scroll scrollbar scrollbar-w-1 sticky top-0 md:p-6'>
               <div className='mb-2'>
                 <button 
                   className='w-full text-sm pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm sm:rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
@@ -287,7 +287,7 @@ const Requests = () => {
                             {section.options.map((option, optionIdx) => (
                               <div key={option.value} className="flex items-center">
                                 <input
-                                  id={`filter-${section.id}-${optionIdx}`}
+                                  id={`reqeust-filter-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
                                   defaultValue={option.value}
                                   type="checkbox"
@@ -296,7 +296,7 @@ const Requests = () => {
                                   onChange={handleFilterChange}
                                 />
                                 <label
-                                  htmlFor={`filter-${section.id}-${optionIdx}`}
+                                  htmlFor={`reqeust-filter-${section.id}-${optionIdx}`}
                                   className="ml-3 text-sm text-gray-600"
                                 >
                                   {option.label}
