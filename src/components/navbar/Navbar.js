@@ -24,7 +24,7 @@ export default function Navbar() {
   const acitveProfileLink = 'flex align-middle pl-2 pr-2 h-full flex justify-center items-center border-b-2 border-black'
   const normalProfileLink = 'flex align-middle pl-2 pr-2 h-full flex justify-center items-center'
 
-  if (!user || userComplete === false ){
+  if (!user || !userComplete ){
     return null
   } else {
     return (

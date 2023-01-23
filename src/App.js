@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/navbar/Navbar";
@@ -15,6 +15,7 @@ import SpecificReport from "./pages/SpecificReport";
 import NewRequest from "./pages/NewRequest";
 import SpecificRequest from "./pages/SpecificRequest";
 import AccountSetup from "./pages/AccountSetup";
+import Loading from "./components/general/Loading";
 
 import { AuthContextProvider } from "./context/AuthContext";
 import CompleteRoute from "./components/auth/CompleteRoute";
@@ -30,7 +31,7 @@ function App() {
         </div>
 
         <div className="flex-1">
-         
+
           <Routes>
               <Route path='/' element={
                 <AuthRoute>
@@ -43,9 +44,9 @@ function App() {
                   <AccountSetup />
                 </CompleteRoute>
               } />
-
+            
               <Route exact path='/home' element={
-                <ProtectedRoute>      
+                <ProtectedRoute>    
                   <Home />
                 </ProtectedRoute>
               } />

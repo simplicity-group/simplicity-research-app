@@ -16,7 +16,7 @@ export const AuthContextProvider = ({ children }) => {
 
     const [user, setUser] = useState({})
     const [profile, setProfile] = useState({})
-    const [userComplete, setUserComplete] = useState(false)
+    const [userComplete, setUserComplete] = useState(null)
     const [profilePic, setProfilePicture] = useState('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png')
 
     const signIn = (email, password) => {
@@ -34,6 +34,22 @@ export const AuthContextProvider = ({ children }) => {
     const changeProfilePicture = (url) => {
         return setProfilePicture(url)
     }
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+            setUser(currentUser)
+            if(currentUser){
+                getCurrentUserProfile(currentUser);
+                if(currentUser.photoURL){
+                    setProfilePicture(currentUser.photoURL)
+                }
+            }
+        })
+        return () => {
+            unsubscribe()
+        }
+    }, [])
 
     async function getCurrentUserProfile(currentUser) {
 
@@ -62,22 +78,6 @@ export const AuthContextProvider = ({ children }) => {
             setUserComplete(false)
         }
     }
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-            setUser(currentUser)
-            if(currentUser){
-                getCurrentUserProfile(currentUser);
-                if(currentUser.photoURL){
-                    setProfilePicture(currentUser.photoURL)
-                }
-            }
-        })
-        return () => {
-            unsubscribe()
-        }
-    }, [])
 
     return (
         <UserContext.Provider value={{user, logout, signIn, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete}}>

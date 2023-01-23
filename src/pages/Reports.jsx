@@ -8,6 +8,7 @@ import reportsData from '../data/reportsData';
 import filters from '../data/filters';
 
 const Reports = () => {
+  
   localStorage.setItem("reportFilters", JSON.stringify(filters));
 
   var reportFilters = JSON.parse(localStorage.getItem("reportFilters"));

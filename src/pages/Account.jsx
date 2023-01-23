@@ -8,6 +8,8 @@ import filters from '../data/filters';
 
 const Account = () => {
 
+  console.log('account')
+
   const {user, logout, profile, profilePic, changeProfilePic} = UserAuth();
 
   const navigate = useNavigate();

@@ -102,10 +102,7 @@ const AccountSetup = () => {
 
   return (
     <div className="bg-gray-100 h-full">
-      {userComplete ? (
-        <Loading />
-      ) : (
-        <div className="ml-4 mr-4 sm:ml-auto sm:mr-auto bg-gray-100 pt-12 md:pt-20 md:w-3/5 ">
+      <div className="ml-4 mr-4 sm:ml-auto sm:mr-auto bg-gray-100 pt-12 md:pt-20 md:w-3/5 ">
         <form className='bg-white rounded-md'>
           <div className="shadow-md border border-gray-400 rounded-md">
             <div className='border-b border-gray p-3 '>
@@ -176,8 +173,6 @@ const AccountSetup = () => {
           <p className='text-gray-500'>User: {user.email}</p>
         </div>
       </div>
-      )}
-
     </div>
     
   )
