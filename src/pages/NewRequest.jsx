@@ -1,76 +1,36 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
-import { useAuth, upload } from '../firebase';
+import { submitRequest } from '../firebase';
 import { useEffect } from 'react';
-import Select from 'react-select';
+import { Button, Spinner } from 'react-bootstrap'
 
 const NewRequest = () => {
 
-  const {user, logout} = UserAuth();
+  const {user, setSelectedRequest} = UserAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [photo, setPhoto] = useState(null);
-  const [photoURL, setPhotoURL] = useState("https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png");
-
-  const hiddenFileInput = React.useRef(null);
-
-  const clickProvidePhotoInput = event => {
-    hiddenFileInput.current.click();
-  }
-
-  function providePhoto(e){
-    if(e.target.files[0]) {
-      setPhoto(e.target.files[0])
-    }
-  }
-
-  function uploadPhoto() {
-      upload(photo, user, setLoading)
-  }
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-      console.log('You are logged out')
-    } catch (e) {
-      console.log(e.message)
-    }
-  }
+  var [whitepaper, setWhitepaper] = useState('');
+  var [pitchdeck, setPitchdeck] = useState('');
+  var [projectName, setProjectName] = useState('');
+  var [projectWebsite, setProjectWebsite] = useState('')
 
   useEffect(() => {
-    if(user?.photoURL) {
-      console.log(user.photoURL)
-      setPhotoURL(user.photoURL)
+
+  }, [])
+
+  
+  const submit = async () =>{
+    if(projectName && (pitchdeck || whitepaper)){
+      setLoading(true);
+      setSelectedRequest(await submitRequest(projectName, projectWebsite, pitchdeck, whitepaper));
+      navigate('/specificrequest');
+      setLoading(false);
+    } else {
+      alert('To submit a request you need to provide a project name and either a pitchdeck or whitepaper.')
     }
-  }, [user])
 
-  const [selectedSectors, setSelectedSectors] = useState(null);
-  // handle onChange event of the dropdown
-  const handleSectorsChange = e => {
-    setSelectedSectors(e);
   }
-  const sectorOptions  = [
-    { label:  'Infrastructure - L1s, L2s, Bridges', value:  'option_1'  },
-    { label:  'Infrastructure - DEXs, Oracles', value:  'option_2'  },
-    { label:  'GameFi', value:  'option_3'  },
-    { label:  'NFTs', value:  'option_4'  },
-    { label:  'Real World', value:  'option_5'  },
-    { label:  'DeFi', value:  'option_6'  },
-  ]
-
-  const [selectedStages, setSelectedStages] = useState(null);
-  const handleStagesChange = e => {
-    setSelectedStages(e);
-  }
-  const stageOptions  = [
-    { label:  'Pre-Seed', value:  'option_1'  },
-    { label:  'Seed', value:  'option_2'  },
-    { label:  'Series A', value:  'option_3'  },
-    { label:  'Series B', value:  'option_4'  },
-    { label:  'Series C', value:  'option_5'  },
-  ]
 
   return (
     <div className="bg-gray-100 h-full">
@@ -83,7 +43,7 @@ const NewRequest = () => {
               <div className="space-y-6  px-4 py-5 sm:p-6">
                 <div className=''>
                   <label className="block text-sm font-medium text-gray-700">Name of Project</label>
-                  <input type="text" name="first-name" id="first-name" autoComplete="given-name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 sm:text-sm"/>
+                  <input onChange={(event) => setProjectName(event.target.value)} type="text" name="project-name" id="project-name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 sm:text-sm" required/>
                 </div>
                 <div className="">
                   <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
@@ -94,6 +54,7 @@ const NewRequest = () => {
                       http://
                     </span>
                     <input
+                      onChange={(event) => setProjectWebsite(event.target.value)}
                       type="text"
                       name="company-website"
                       id="company-website"
@@ -104,7 +65,7 @@ const NewRequest = () => {
                 </div>
                 <div className="">
                   <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
-                    Pitch Deck
+                    Pitchdeck
                   </label>    
                   <input className="form-control
                     block
@@ -120,8 +81,12 @@ const NewRequest = () => {
                     transition
                     ease-in-out
                     m-0
-                    focus:text-gray-700 focus:bg-white focus:border-gray-500 focus:outline-none" type="file" id="formFile"/>
+                    focus:text-gray-700 focus:bg-white focus:border-gray-500 focus:outline-none" 
+                    type="file" 
+                    onChange={(event) => {setPitchdeck(event.target.files[0])}}
+                    />
                 </div>
+
                 <div className="">
                   <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
                     White Paper
@@ -140,21 +105,34 @@ const NewRequest = () => {
                     transition
                     ease-in-out
                     m-0
-                    focus:text-gray-700 focus:bg-white focus:border-gray-500 focus:outline-none" type="file" id="formFile"/>
+                    focus:text-gray-700 focus:bg-white focus:border-gray-500 focus:outline-none" 
+                    type="file" 
+                    onChange={(event) => {setWhitepaper(event.target.files[0])}}
+                    />
                 </div>
                 <div className="pt-3 flex justify-between items-center">
-                  <div className='flex-1'>
-
-                  </div>
                   <div className='flex-1 flex justify-end'>
-                    <button type="submit" className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900"
+                    <button type="button"
+                      className="inline-flex items-center px-4 py-3 text-sm text-white bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:hover:bg-gray-200 disabled:text-gray-400 disabled:hover:shadow-none"
+                      onClick={() => {submit()}}
+                      disabled={projectName === '' || pitchdeck === '' && whitepaper === ''}
                       >
-                      Submit Request
+                      { loading === false &&
+                      <p>Submit</p>
+                      }
+                      { loading === true &&
+                      <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                      </svg>
+                      }
                     </button>
                   </div>
                 </div>
               </div>
-              
             </div>
           </form>
         </div>

@@ -341,9 +341,14 @@ const Requests = () => {
                   </button>
                 </div>
               } 
-              {visible > requestsData.length &&
+              {requestsData.length > 0 && visible > requestsData.length &&
               <div className='w-100 flex'>
-                <p className='m-auto text-gray-500'>no more reports &nbsp; ╮(●︿●)╭</p> 
+                <p className='m-auto text-gray-500'>no more requests</p> 
+              </div>
+              }
+              {requestsData.length == 0 && visible > requestsData.length &&
+              <div className='w-100 flex'>
+                <p className='m-auto text-gray-500'>no results &nbsp; ╮(●︿●)╭</p> 
               </div>
               }
               

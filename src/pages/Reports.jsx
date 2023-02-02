@@ -10,22 +10,33 @@ import { UserAuth } from '../context/AuthContext';
 
 const Reports = () => {
   
-  var {filters, reportsLoading, setReportsLoading, reportsData, setReportsData, setSelectedReport} = UserAuth();
+  var {filters, reportsLoading, setReportsLoading, reportsData, setReportsData, setSelectedReport, onSpecificReport, setOnSpecificReport} = UserAuth();
+  const [reportFilters, setReportFilters] = useState([])
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [visible, setVisible] = useState(8);
+  const [filteredReports, setFilteredReports] = useState(reportsData);
 
   useEffect(() => {
+    if(!onSpecificReport){
+      getReportsData();
+    }
+    else{
+      setOnSpecificReport(false);
+    }
     localStorage.setItem("reportFilters", JSON.stringify(filters));
     var reportFilters = JSON.parse(localStorage.getItem("reportFilters"));
     reportFilters.pop(1) 
     setReportFilters(reportFilters)
   }, [])
 
-  const [reportFilters, setReportFilters] = useState([])
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [visible, setVisible] = useState(8);
-  
-  var fetchFilteredReports = async () => {
+  const getReportsData = async () => {
     setReportsLoading(true);
+    setReportsData(await getReports());
+    setReportsLoading(false);
+  }
 
+  var filterReports = async () => {
+    setReportsLoading(true);
     localStorage.setItem("reportFiltersTrue", JSON.stringify(reportFilters));
     var reportFiltersTrue = JSON.parse(localStorage.getItem("reportFiltersTrue"));
 
@@ -42,14 +53,41 @@ const Reports = () => {
       }
     }
 
-    //Get reports with filters
-    reportsData = await getReports(reportFiltersTrue);
-    setReportsData(reportsData);
+    //Split filters
+    var sectorsFilter = reportFiltersTrue[0].options
+    let sectorsFilterMapped = sectorsFilter.map(sector => { return sector.value });
+    var ratingFilter = reportFiltersTrue[1].options
+    let ratingFilterMapped = ratingFilter.map(rating => { return rating.value });
+    var stageFilter = reportFiltersTrue[2].options
+    let stageFilterMapped = stageFilter.map(stage => { return stage.value });
+
+    //Filter for stage & rating
+    setFilteredReports(reportsData.filter(function(report){
+
+      var reportExist = false;
+      var sectorsSplit = report.sectors.split(' ');
+
+      for(var sectorSplitIndex = 0; sectorSplitIndex < sectorsSplit.length; sectorSplitIndex++){
+        //Check for sectors
+        if(sectorsFilterMapped.includes(sectorsSplit[sectorSplitIndex])){
+          reportExist = true;
+        }       
+      }
+      //Check for stages and rating
+      if(reportExist == false){
+        if(stageFilterMapped.includes(report.stage) || ratingFilterMapped.includes(report.rating)){
+          reportExist = true;
+        }
+      }
+
+      return reportExist
+    }));  
+
     setReportsLoading(false);
   }
 
   const showMoreReports = () => {
-    if (visible < reportsData.length){
+    if (visible < filteredReports.length){
       setVisible((prevValue) => prevValue + 8);
     }
   };
@@ -64,7 +102,7 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = false;
       }
     }
-    fetchFilteredReports();
+    filterReports();
   };
 
   const unselectAllMobile = () => {
@@ -77,7 +115,7 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = false;
       }
     }
-    fetchFilteredReports();
+    filterReports();
   };
 
   const selectAll = () => {
@@ -90,7 +128,7 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = true;
       }
     }
-    fetchFilteredReports();
+    filterReports();
   };
 
   const selectAllMobile = () => {
@@ -103,14 +141,14 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = true;
       }
     }
-    fetchFilteredReports();
+    filterReports();
   };
 
   const handleFilterChange = (e) => {
     let filterId = e.target.id;
     const selectedFilter = filterId.split('-');
     reportFilters[selectedFilter[2]].options[selectedFilter[3]].checked = e.target.checked
-    fetchFilteredReports();
+    filterReports();
   };
 
   function selectReport(report){
@@ -314,7 +352,7 @@ const Reports = () => {
               reportsLoading 
               ? <LoadingData />
               : <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-1 lg:grid-cols-2 ">
-                    {reportsData.slice(0, visible).map(report => (
+                    {filteredReports.slice(0, visible).map(report => (
                       <div key={report.id} onClick={() => selectReport(report)}>
                         <ReportCard 
                           id={report.id}
@@ -328,7 +366,7 @@ const Reports = () => {
                 </div>
 
             }
-            {visible <= reportsData.length && 
+            {visible <= filteredReports.length && 
               <div className='w-100 flex'>
                 <button 
                   className='m-auto pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
@@ -337,12 +375,12 @@ const Reports = () => {
                 </button>
               </div>
             } 
-            {reportsData.length > 0 && visible > reportsData.length &&
+            {filteredReports.length > 0 && visible > filteredReports.length &&
             <div className='w-100 flex'>
               <p className='m-auto text-gray-500'>no more reports</p> 
             </div>
             }
-            {reportsData.length == 0 && visible > reportsData.length &&
+            {filteredReports.length == 0 && visible > filteredReports.length &&
             <div className='w-100 flex'>
               <p className='m-auto text-gray-500'>no results &nbsp; ╮(●︿●)╭</p> 
             </div>

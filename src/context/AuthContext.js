@@ -25,10 +25,13 @@ export const AuthContextProvider = ({ children }) => {
     var [selectedReport , setSelectedReport] = useState([])
     var [reportsLoading, setReportsLoading] = useState(true)
     var [reportsData, setReportsData] = useState([])
+    var [onSpecificReport, setOnSpecificReport] = useState(false)
 
     var [selectedRequest , setSelectedRequest] = useState([])
     var [requestsLoading, setRequestsLoading] = useState(true)
     var [requestsData, setRequestsData] = useState([])
+    var [onSpecificRequest, setOnSpecificRequest] = useState(false)
+
 
     const signIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
@@ -113,7 +116,7 @@ export const AuthContextProvider = ({ children }) => {
     }, [])
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading}}>
+        <UserContext.Provider value={{user, logout, signIn, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest}}>
             {children}
         </UserContext.Provider>
     );
