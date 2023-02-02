@@ -15,7 +15,6 @@ import SpecificReport from "./pages/SpecificReport";
 import NewRequest from "./pages/NewRequest";
 import SpecificRequest from "./pages/SpecificRequest";
 import AccountSetup from "./pages/AccountSetup";
-import Loading from "./components/general/Loading";
 
 import { AuthContextProvider } from "./context/AuthContext";
 import CompleteRoute from "./components/auth/CompleteRoute";

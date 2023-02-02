@@ -1,7 +1,7 @@
 import React, { Children } from 'react'
 import { Navigate } from 'react-router-dom'
 import { UserAuth } from '../../context/AuthContext'
-import Loading from '../general/Loading'
+import LoadingAuth from '../general/LoadingAuth'
 
 const ProtectedRoute = ({children}) => {
     const {user, userComplete} = UserAuth();
@@ -11,7 +11,7 @@ const ProtectedRoute = ({children}) => {
     }
     else if(user && (userComplete === false || userComplete === null)) {
       if(userComplete === null){
-        return <Loading />
+        return <LoadingAuth />
       }
       else if(userComplete === false){
         return <Navigate to='/accountsetup' />

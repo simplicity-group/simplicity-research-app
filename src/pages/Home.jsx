@@ -6,9 +6,6 @@ import { UserAuth } from '../context/AuthContext'
 const Home = () => {
   const {profile} = UserAuth();
 
-  console.log('home')
-
-
   return (
     <div className="bg-gray-100 h-full justify-center items-center grid grid-cols-1 gap-x-4 pt-10 sm:pt-10 sm:mb-auto sm:px-6 md:pt-10 md:mb-auto lg:mt-auto lg:mb-auto lg:grid-cols-3 lg:px-8">
       <div className='pl-4 pr-4 mb-10 col-span-3 sm:mb-10 lg:col-span-2'>

@@ -1,22 +1,53 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Fragment, useState } from 'react'
 import ReportCard from '../components/reports/ReportCard';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
-import reportsData from '../data/reportsData';
-import filters from '../data/filters';
+import { getReports } from '../firebase';
+import LoadingData from '../components/general/LoadingData';
+import { UserAuth } from '../context/AuthContext';
 
 const Reports = () => {
   
-  localStorage.setItem("reportFilters", JSON.stringify(filters));
+  var {filters, reportsLoading, setReportsLoading, reportsData, setReportsData, setSelectedReport} = UserAuth();
 
-  var reportFilters = JSON.parse(localStorage.getItem("reportFilters"));
-  reportFilters.pop(1) 
+  useEffect(() => {
+    localStorage.setItem("reportFilters", JSON.stringify(filters));
+    var reportFilters = JSON.parse(localStorage.getItem("reportFilters"));
+    reportFilters.pop(1) 
+    setReportFilters(reportFilters)
+  }, [])
 
+  const [reportFilters, setReportFilters] = useState([])
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [visible, setVisible] = useState(8);
   
+  var fetchFilteredReports = async () => {
+    setReportsLoading(true);
+
+    localStorage.setItem("reportFiltersTrue", JSON.stringify(reportFilters));
+    var reportFiltersTrue = JSON.parse(localStorage.getItem("reportFiltersTrue"));
+
+    //Get checked filters
+    for (var i = 0; i < reportFiltersTrue.length; i++){
+      for (var x = 0; x < reportFiltersTrue[i].options.length; x++){
+        delete reportFiltersTrue[i].options[x].label
+        if(reportFiltersTrue[i].options[x].checked === false){
+          delete reportFiltersTrue[i].options[x]
+        }
+        else{
+          delete reportFiltersTrue[i].options[x].checked
+        }
+      }
+    }
+
+    //Get reports with filters
+    reportsData = await getReports(reportFiltersTrue);
+    setReportsData(reportsData);
+    setReportsLoading(false);
+  }
+
   const showMoreReports = () => {
     if (visible < reportsData.length){
       setVisible((prevValue) => prevValue + 8);
@@ -33,7 +64,7 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = false;
       }
     }
-    filterReports();
+    fetchFilteredReports();
   };
 
   const unselectAllMobile = () => {
@@ -46,7 +77,7 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = false;
       }
     }
-    filterReports();
+    fetchFilteredReports();
   };
 
   const selectAll = () => {
@@ -59,7 +90,7 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = true;
       }
     }
-    filterReports();
+    fetchFilteredReports();
   };
 
   const selectAllMobile = () => {
@@ -72,24 +103,19 @@ const Reports = () => {
         document.getElementById(checkboxId).checked = true;
       }
     }
-    filterReports();
+    fetchFilteredReports();
   };
 
   const handleFilterChange = (e) => {
     let filterId = e.target.id;
     const selectedFilter = filterId.split('-');
-    reportFilters[selectedFilter[1]].options[selectedFilter[2]].checked = e.target.checked
-    console.log(reportFilters[selectedFilter[1]].options[selectedFilter[2]])
-    filterReports();
-  };
-
-  const filterReports = () => {
-    console.log('Searching with new filter...')
-    console.log(reportFilters)
+    reportFilters[selectedFilter[2]].options[selectedFilter[3]].checked = e.target.checked
+    fetchFilteredReports();
   };
 
   function selectReport(report){
-    localStorage.setItem("selectedReport", JSON.stringify(report));
+    setSelectedReport(report);
+    //localStorage.setItem("selectedReport", JSON.stringify(report));
   }
   
   return (
@@ -284,35 +310,43 @@ const Reports = () => {
           {/* Report grid */}
           <div className="flex-1 flex bg-gray-100">
             <div className='flex-1 p-6 '>
-              <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-1 lg:grid-cols-2 ">
-                  {reportsData.slice(0, visible).map(report => (
-                    <div key={report.id} onClick={() => selectReport(report)}>
-                      <ReportCard 
-                        id={report.id}
-                        name={report.name} 
-                        summary={report.summary}
-                        rating={report.rating}
-                        someMetric1={report.someMetric1}
-                        someMetric2={report.someMetric2}
-                      />
-                    </div>
-                  ))}
-              </div>
-              {visible <= reportsData.length && 
-                <div className='w-100 flex'>
-                  <button 
-                    className='m-auto pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
-                    onClick={showMoreReports}>
-                      Load more
-                  </button>
+            {
+              reportsLoading 
+              ? <LoadingData />
+              : <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-1 lg:grid-cols-2 ">
+                    {reportsData.slice(0, visible).map(report => (
+                      <div key={report.id} onClick={() => selectReport(report)}>
+                        <ReportCard 
+                          id={report.id}
+                          name={report.name} 
+                          summary={report.summary}
+                          rating={report.rating}
+                          stage={report.stage}
+                        />
+                      </div>
+                    ))}
                 </div>
-              } 
-              {visible > reportsData.length &&
+
+            }
+            {visible <= reportsData.length && 
               <div className='w-100 flex'>
-                <p className='m-auto text-gray-500'>no more reports &nbsp; ╮(●︿●)╭</p> 
+                <button 
+                  className='m-auto pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
+                  onClick={showMoreReports}>
+                  Load more
+                </button>
               </div>
-              }
-              
+            } 
+            {reportsData.length > 0 && visible > reportsData.length &&
+            <div className='w-100 flex'>
+              <p className='m-auto text-gray-500'>no more reports</p> 
+            </div>
+            }
+            {reportsData.length == 0 && visible > reportsData.length &&
+            <div className='w-100 flex'>
+              <p className='m-auto text-gray-500'>no results &nbsp; ╮(●︿●)╭</p> 
+            </div>
+            }
             </div>
           </div>
 

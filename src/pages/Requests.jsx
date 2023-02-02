@@ -4,11 +4,15 @@ import RequestCard from '../components/requests/RequestCard.jsx'
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
-import requestsData from '../data/requestsData';
-import filters from '../data/filters';
 import { Link } from 'react-router-dom';
+import { UserAuth } from '../context/AuthContext';
 
 const Requests = () => {
+
+  var {filters, requestsLoading, setRequestsLoading, requestsData, setRequestsData, setSelectedRequest} = UserAuth();
+
+  localStorage.setItem("requestFilters", JSON.stringify(filters));
+  var requestFilters = JSON.parse(localStorage.getItem("requestFilters"));
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [visible, setVisible] = useState(21);
@@ -21,11 +25,11 @@ const Requests = () => {
 
   const unselectAll = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < requestFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'reqeust-filter-' + i + '-' + f
-        filters[i].options[f].checked = false;
+      for (f = 0; f < requestFilters[i].options.length; f++){
+        let checkboxId = 'request-filter-' + i + '-' + f
+        requestFilters[i].options[f].checked = false;
         document.getElementById(checkboxId).checked = false;
       }
     }
@@ -34,11 +38,11 @@ const Requests = () => {
 
   const unselectAllMobile = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < requestFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'reqeust-filter-mobile-' + i + '-' + f
-        filters[i].options[f].checked = false;
+      for (f = 0; f < requestFilters[i].options.length; f++){
+        let checkboxId = 'request-filter-mobile-' + i + '-' + f
+        requestFilters[i].options[f].checked = false;
         document.getElementById(checkboxId).checked = false;
       }
     }
@@ -47,11 +51,11 @@ const Requests = () => {
 
   const selectAll = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < requestFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'reqeust-filter-' + i + '-' + f
-        filters[i].options[f].checked = true;
+      for (f = 0; f < requestFilters[i].options.length; f++){
+        let checkboxId = 'request-filter-' + i + '-' + f
+        requestFilters[i].options[f].checked = true;
         document.getElementById(checkboxId).checked = true;
       }
     }
@@ -60,11 +64,11 @@ const Requests = () => {
 
   const selectAllMobile = () => {
     let i = 0;
-    for (i = 0; i < filters.length; i++){
+    for (i = 0; i < requestFilters.length; i++){
       let f = 0;
-      for (f = 0; f < filters[i].options.length; f++){
-        let checkboxId = 'reqeust-filter-mobile-' + i + '-' + f
-        filters[i].options[f].checked = true;
+      for (f = 0; f < requestFilters[i].options.length; f++){
+        let checkboxId = 'request-filter-mobile-' + i + '-' + f
+        requestFilters[i].options[f].checked = true;
         document.getElementById(checkboxId).checked = true;
       }
     }
@@ -74,18 +78,18 @@ const Requests = () => {
   const handleFilterChange = (e) => {
     let filterId = e.target.id;
     const selectedFilter = filterId.split('-');
-    filters[selectedFilter[1]].options[selectedFilter[2]].checked = e.target.checked
-    console.log(filters[selectedFilter[1]].options[selectedFilter[2]])
+    requestFilters[selectedFilter[2]].options[selectedFilter[3]].checked = e.target.checked
     filterReports();
   };
 
   const filterReports = () => {
     console.log('Searching with new filter...')
-    console.log(filters)
+    console.log(requestFilters)
   };
 
   function selectRequest(request){
-    localStorage.setItem("selectedRequest", JSON.stringify(request));
+    setSelectedRequest(request);
+    //localStorage.setItem("selectedRequest", JSON.stringify(request));
   }
   
   return (
@@ -182,7 +186,7 @@ const Requests = () => {
                               {section.options.map((option, optionIdx) => (
                                 <div key={option.value} className="flex items-center">
                                   <input
-                                    id={`reqeust-filter-mobile-${section.id}-${optionIdx}`}
+                                    id={`request-filter-mobile-${section.id}-${optionIdx}`}
                                     name={`${section.id}[]`}
                                     defaultValue={option.value}
                                     type="checkbox"
@@ -287,7 +291,7 @@ const Requests = () => {
                             {section.options.map((option, optionIdx) => (
                               <div key={option.value} className="flex items-center">
                                 <input
-                                  id={`reqeust-filter-${section.id}-${optionIdx}`}
+                                  id={`request-filter-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
                                   defaultValue={option.value}
                                   type="checkbox"
@@ -296,7 +300,7 @@ const Requests = () => {
                                   onChange={handleFilterChange}
                                 />
                                 <label
-                                  htmlFor={`reqeust-filter-${section.id}-${optionIdx}`}
+                                  htmlFor={`request-filter-${section.id}-${optionIdx}`}
                                   className="ml-3 text-sm text-gray-600"
                                 >
                                   {option.label}
@@ -314,7 +318,7 @@ const Requests = () => {
 
           </div> 
 
-          {/* Report grid */}
+          {/* Request grid */}
           <div className="flex-1 flex bg-gray-100">
             <div className='flex-1 p-6 '>
               <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

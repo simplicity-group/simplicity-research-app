@@ -4,9 +4,8 @@ import { UserAuth } from '../context/AuthContext'
 import { upload, db } from '../firebase';
 import FixRequiredSelect from '../components/general/FixRequiredSelect';
 import BaseSelect from 'react-select';
-import Loading from '../components/general/Loading';
 import { doc, collection, addDoc, setDoc, updateDoc } from 'firebase/firestore'
-import filters from '../data/filters';
+import filters from '../data/filters'
 
 const Select = props => (
     <FixRequiredSelect
@@ -18,10 +17,10 @@ const Select = props => (
 
 const AccountSetup = () => {
 
-  const {user, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete} = UserAuth();
+  const { user, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete} = UserAuth();
   const userstoreRef = collection(db, "userstore")
   const navigate = useNavigate();
-
+    
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
   const hiddenFileInput = React.useRef(null);

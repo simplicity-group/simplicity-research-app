@@ -4,13 +4,12 @@ import { UserAuth } from '../context/AuthContext'
 import { useAuth, upload } from '../firebase';
 import { useEffect } from 'react';
 import Select from 'react-select';
-import filters from '../data/filters';
 
 const Account = () => {
 
   console.log('account')
 
-  const {user, logout, profile, profilePic, changeProfilePic} = UserAuth();
+  const {filters, user, logout, profile, profilePic, changeProfilePic} = UserAuth();
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);

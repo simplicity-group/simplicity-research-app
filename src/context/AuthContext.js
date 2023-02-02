@@ -5,6 +5,7 @@ import {signInWithEmailAndPassword,
 } from 'firebase/auth'
 import {auth} from '../firebase'
 import { db } from '../firebase';
+import { getFilters, getRequests, getReports } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore'
 
 var userstoreData = []
@@ -14,10 +15,20 @@ const UserContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
 
-    const [user, setUser] = useState({})
-    const [profile, setProfile] = useState({})
-    const [userComplete, setUserComplete] = useState(null)
-    const [profilePic, setProfilePicture] = useState('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png')
+    var [user, setUser] = useState({})
+    var [profile, setProfile] = useState({})
+    var [userComplete, setUserComplete] = useState(null)
+    var [profilePic, setProfilePicture] = useState('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png')
+
+    var [filters, setFilters] = useState([])
+
+    var [selectedReport , setSelectedReport] = useState([])
+    var [reportsLoading, setReportsLoading] = useState(true)
+    var [reportsData, setReportsData] = useState([])
+
+    var [selectedRequest , setSelectedRequest] = useState([])
+    var [requestsLoading, setRequestsLoading] = useState(true)
+    var [requestsData, setRequestsData] = useState([])
 
     const signIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
@@ -34,22 +45,6 @@ export const AuthContextProvider = ({ children }) => {
     const changeProfilePicture = (url) => {
         return setProfilePicture(url)
     }
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-            setUser(currentUser)
-            if(currentUser){
-                getCurrentUserProfile(currentUser);
-                if(currentUser.photoURL){
-                    setProfilePicture(currentUser.photoURL)
-                }
-            }
-        })
-        return () => {
-            unsubscribe()
-        }
-    }, [])
 
     async function getCurrentUserProfile(currentUser) {
 
@@ -79,8 +74,46 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
+    var fetchFilters = async () => {
+        filters = await getFilters();
+        setFilters(filters)
+    }
+
+    var fetchReports = async () => {
+        reportsData = await getReports(null);
+        setReportsData(reportsData);
+        setReportsLoading(false);
+    }
+
+    var fetchRequests = async () => {
+        requestsData = await getRequests(null);
+        setRequestsData(requestsData);
+        setRequestsLoading(false);        
+    }
+
+    useEffect(() => {
+        fetchFilters()
+        fetchReports()
+        fetchRequests()
+
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+            setUser(currentUser)
+            if(currentUser){
+                getCurrentUserProfile(currentUser);
+                if(currentUser.photoURL){
+                    setProfilePicture(currentUser.photoURL)
+                }
+            }
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [])
+
     return (
-        <UserContext.Provider value={{user, logout, signIn, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete}}>
+        <UserContext.Provider value={{user, logout, signIn, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading}}>
             {children}
         </UserContext.Provider>
     );

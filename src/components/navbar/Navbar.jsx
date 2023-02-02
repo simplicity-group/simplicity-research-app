@@ -15,7 +15,47 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
-  const {user, userComplete, profilePic} = UserAuth();
+  const navigate = useNavigate();
+
+  const {user, userComplete, profilePic, reportsData, setSelectedReport, requestsData, setSelectedRequest} = UserAuth();
+
+  //Put report and request arrays together
+  const items = reportsData.concat(requestsData)
+
+  const [search,setSearch] = useState('');
+  const [searchResultsVisible, setSearchResultsVisible] = useState(false)
+
+  function searching(value){
+    if(value){
+      setSearch(value)
+      const filteredResults = items.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
+      if (filteredResults.length === 0){
+        setSearchResultsVisible(false)
+      }
+      else{
+        setSearchResultsVisible(true)
+      }
+    }
+    else{
+      setSearchResultsVisible(false)
+    }
+  }
+
+  function searchClick(item){
+    setSearchResultsVisible(false)
+
+    //Navigate to request
+    if(item.status){
+      setSelectedRequest(item)
+      navigate('/specificrequest');
+    }
+    //Navigate to report
+    else{
+      setSelectedReport(item)
+      navigate('/specificreport');
+    }
+  }
+
   const activeLogoNavbarLink = 'border-b-2 border-black text-black px-4 py-4 h-full text-sm font-medium'
   const activeNavbarLink = 'border-b-2 border-black text-black px-4 py-5 h-full text-base font-medium'
   const normalNavbarLink = 'text-gray-600 hover:text-black px-4 py-5 rounded-md text-base font-sm'
@@ -81,13 +121,40 @@ export default function Navbar() {
                 <div className="flex flex-auto h-full justify-end absolute inset-y-0 right-0 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                   {/* Search bar */}
                   <div className="relative hidden sm:block w-4/6">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
+                    <div className='w-full'>
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                          <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
+                      </div>
+                      <input 
+                        onChange={(e) => searching(e.target.value)}
+                        type="text" 
+                        id="search-navbar" 
+                        className="bg-gray-100 block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-black focus:border-black" 
+                        placeholder="Search"
+                      />
+
+                      { searchResultsVisible === true &&
+                      <div className='absolute w-full bg-white border border-gray-300 rounded-md mt-1 shadow-md'>
+                          {items.filter((item) => {
+                            return search.toLowerCase() === ''
+                            ? null
+                            : item.name.toLowerCase().includes(search.toLowerCase());
+                              }).map((item) => (
+                                <div key={item.name} onClick={() => searchClick(item)} className='p-2 w-full hover:bg-gray-100 hover:cursor-pointer'>
+                                  <p className='w-full text-sm'> 
+                                    {item.name}
+                                  </p>
+                                </div>
+                              ))
+                          }
+                      </div>
+                      }
+
                     </div>
-                      <input type="text" id="search-navbar" className="bg-gray-100 block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Search"/>
                   </div>
-                  {/* Profile dropdown */}
+
+                  {/* Profile */}
                   <Menu as="div" className="relative ml-3 h-full">
                     <div className='h-full '>
                       <NavLink key='account' to='/account' 

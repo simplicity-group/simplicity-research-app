@@ -1,9 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { UserAuth } from '../context/AuthContext';
 
 const SpecificReport = () => {
 
-  var currentReport = JSON.parse(localStorage.getItem("selectedReport"))
+  var {selectedReport} = UserAuth();
 
   return (
     <div className='h-full bg-gray-100'>
@@ -22,9 +23,9 @@ const SpecificReport = () => {
       <div className="bg-white shadow-md rounded-lg border border-gray-400  h-full mx-auto grid grid-cols-1 gap-y-4 gap-x-8 py-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         
         <div className=''>
-          <h2 className="text-2xl font-bold mb-4 pb-5 tracking-tight text-gray-900 sm:text-6xl border-b border-gray-200">{currentReport.name}</h2>
+          <h2 className="text-2xl font-bold mb-4 pb-5 tracking-tight text-gray-900 sm:text-6xl border-b border-gray-200">{selectedReport.name}</h2>
           <p className="mt-4 mb-4 text-gray-500">
-            {currentReport.summary}
+            {selectedReport.summary}
           </p>
           <button 
             className='flex mb-2 mt-2  pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'>
@@ -42,15 +43,15 @@ const SpecificReport = () => {
         <div className=" grid grid-cols- grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
           <div className="border-t border-gray-200 pt-4">
             <dt className="text-xl sm:text-2xl font-bold">Rating</dt>
-            <dd className="text-xl mt-2 text-md text-gray-500">{currentReport.rating}</dd>
+            <dd className="text-xl mt-2 text-md text-gray-500">{selectedReport.rating}</dd>
           </div>
           <div className="border-t border-gray-200 pt-4">
             <dt className="text-xl sm:text-2xl font-bold">Some Metric 1</dt>
-            <dd className="text-xl mt-2 text-md text-gray-500">{currentReport.someMetric1}</dd>
+            <dd className="text-xl mt-2 text-md text-gray-500">{selectedReport.someMetric1}</dd>
           </div>
           <div className="border-t border-gray-200 pt-4">
             <dt className="text-xl sm:text-2xl font-bold">Some Metric 2</dt>
-            <dd className="text-xl mt-2 text-md text-gray-500">{currentReport.someMetric2}</dd>
+            <dd className="text-xl mt-2 text-md text-gray-500">{selectedReport.someMetric2}</dd>
           </div>
           <div>
           </div>
