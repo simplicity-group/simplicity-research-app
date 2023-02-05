@@ -1,16 +1,22 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { UserAuth } from '../context/AuthContext';
 
 const SpecificRequest = () => {
   const navigate = useNavigate();
 
-  var {selectedRequest, setOnSpecificRequest} = UserAuth();
+  var {selectedRequest, setOnSpecificRequest, getValueLabel} = UserAuth();
 
   function backToRequests(){
     setOnSpecificRequest(true);
     navigate('/requests');
   }
+
+  useEffect(() => {
+    if(selectedRequest.length === 0){
+      navigate('/requests');
+    }
+  }, [])
 
   return (
     <div className='h-full bg-gray-100'>
@@ -26,14 +32,14 @@ const SpecificRequest = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg border border-gray-400  h-full mx-auto grid grid-cols-1 gap-y-16 gap-x-8 py-6 px-4 sm:px-6 lg:grid-cols-1 lg:px-8">
+        <div className="bg-white shadow-md rounded-md border border-gray-400  h-full mx-auto grid grid-cols-1 gap-y-16 gap-x-8 py-6 px-4 sm:px-6 lg:grid-cols-1 lg:px-8">
           
           <div className=''>
             <h2 className="text-2xl mb-4 pb-5 font-bold tracking-tight text-gray-900 sm:text-6xl border-b border-gray-200">{selectedRequest.name}</h2>
             <p className="mt-4 mb-4 text-gray-500">
               {selectedRequest.summary}
             </p>
-              Status: {selectedRequest.status}
+              Status: {getValueLabel('status', selectedRequest.status)}
           </div>
 
         </div>

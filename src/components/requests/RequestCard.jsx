@@ -1,7 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { UserAuth } from '../../context/AuthContext';
+
 
 const ReportCard = (props) => {
+
+  var {getValueLabel} = UserAuth();
+
   return (
     <Link 
       to="/specificrequest"> 
@@ -13,7 +18,7 @@ const ReportCard = (props) => {
             <div className="px-4 py-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">
-                    <p>{props.status}</p>
+                    <p>{getValueLabel('status', props.status)}</p>
                 </dd>
             </div>
         </div>

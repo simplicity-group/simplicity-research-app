@@ -1,8 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import TextTruncate from 'react-text-truncate'
+import { UserAuth } from '../../context/AuthContext';
 
 const ReportCard = (props) => {
+    const {getValueLabel} = UserAuth();
 
     return (
     <Link to='/specificreport'>
@@ -26,11 +28,11 @@ const ReportCard = (props) => {
                     <dl>
                     <div className="px-4 py-3 grid sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
                         <dt className="text-sm font-medium text-gray-500">Rating</dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">{props.rating}</dd>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">{getValueLabel('rating', props.rating)}</dd>
                     </div>
                     <div className=" px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
                         <dt className="text-sm font-medium text-gray-500">Stage</dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">{props.stage}</dd>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">{getValueLabel('stage', props.stage)}</dd>
                     </div>
                     </dl>
                 </div>

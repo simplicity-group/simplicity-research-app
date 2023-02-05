@@ -33,7 +33,6 @@ export const AuthContextProvider = ({ children }) => {
     var [requestsData, setRequestsData] = useState([])
     var [onSpecificRequest, setOnSpecificRequest] = useState(false)
 
-
     const signIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
     }
@@ -92,6 +91,60 @@ export const AuthContextProvider = ({ children }) => {
         setRequestsLoading(false);        
     }
 
+    var getValueLabel = (group, valueInput) => {
+        //sectors
+        if(valueInput){
+            if(group === 'sectors'){
+                let sectorsMapped = filters[0].options.map(sector => { return sector.value });
+
+                var sectorsSplit = valueInput.split(' ');
+                var labels = []
+
+                for(var sectorSplitIndex = 0; sectorSplitIndex < sectorsSplit.length; sectorSplitIndex++){
+                    labels[sectorSplitIndex] = filters[0].options[sectorsMapped.indexOf(sectorsSplit[sectorSplitIndex])].label;
+                }
+                if(!labels){
+                    return valueInput
+                }
+                return labels
+            }
+
+            //rating
+            else if(group === 'rating'){
+                let ratingsMapped = filters[1].options.map(rating => { return rating.value });
+                let index = ratingsMapped.indexOf(valueInput)
+                if(index < 0){
+                    return valueInput
+                }
+                return filters[1].options[index].label
+            }
+
+            //stage
+            else if(group === 'stage'){
+                let stagesMapped = filters[2].options.map(stage => { return stage.value });
+                let index = stagesMapped.indexOf(valueInput)
+                if(index < 0){
+                    return valueInput
+                }
+                return filters[2].options[index].label
+            }
+
+            //status
+            else if(group === 'status'){
+                let statusMapped = filters[3].options.map(status => { return status.value });
+                let index = statusMapped.indexOf(valueInput)
+                if(index < 0){
+                    return valueInput
+                }
+
+                return filters[3].options[index].label
+            }
+        }
+        else{
+            return
+        }
+    }
+
     useEffect(() => {
         fetchFilters()
         fetchReports()
@@ -114,7 +167,7 @@ export const AuthContextProvider = ({ children }) => {
     }, [])
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest}}>
+        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
             {children}
         </UserContext.Provider>
     );

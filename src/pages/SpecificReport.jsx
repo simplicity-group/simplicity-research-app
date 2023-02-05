@@ -1,31 +1,22 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { UserAuth } from '../context/AuthContext';
 
 const SpecificReport = () => {
   const navigate = useNavigate();
 
-  var {selectedReport, setOnSpecificReport} = UserAuth();
-
-  console.log(selectedReport.downloadURL)
+  var {selectedReport, setOnSpecificReport, getValueLabel} = UserAuth();
 
   function backToReports(){
     setOnSpecificReport(true);
     navigate('/reports');
   }
 
-  function downloadReport(){
-    console.log(selectedReport)
-    fetch(selectedReport.downloadURL).then(res => res.blob()).then(file => {
-      let tempUrl = URL.createObjectURL(file);
-      let aTag = document.createElement("a");
-      aTag.href = tempUrl;
-      aTag.download = "filename";
-      document.body.appendChild(aTag);
-      aTag.click();
-      aTag.remove();
-    })
-  }
+  useEffect(() => {
+    if(selectedReport.length === 0){
+      navigate('/reports');
+    }
+  }, [])
 
   return (
     <div className='h-full bg-gray-100'>
@@ -41,7 +32,7 @@ const SpecificReport = () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg border border-gray-400  h-full mx-auto grid grid-cols-1 gap-y-4 gap-x-8 py-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+      <div className="bg-white shadow-md rounded-md border border-gray-400  h-full mx-auto grid grid-cols-1 gap-y-4 gap-x-8 py-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         
         <div className=''>
           <h2 className="text-2xl font-bold mb-4 pb-5 tracking-tight text-gray-900 sm:text-6xl border-b border-gray-200">{selectedReport.name}</h2>
@@ -65,7 +56,7 @@ const SpecificReport = () => {
           </a>
           }
           { !selectedReport.downloadURL &&
-            <p className='m-auto text-gray-500'>no report document provided &nbsp; ╮(●︿●)╭</p> 
+            <p className='m-auto text-gray-500 text-sm'>no report document provided &nbsp; ╮(●︿●)╭</p> 
           }
 
         </div>
@@ -73,15 +64,15 @@ const SpecificReport = () => {
         <div className=" grid grid-cols- grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
           <div className="border-t border-gray-200 pt-4">
             <dt className="text-xl sm:text-2xl font-bold">Rating</dt>
-            <dd className="text-xl mt-2 text-md text-gray-500">{selectedReport.rating}</dd>
+            <dd className="text-xl mt-2 text-md text-gray-500">{getValueLabel('rating', selectedReport.rating)}</dd>
           </div>
           <div className="border-t border-gray-200 pt-4">
-            <dt className="text-xl sm:text-2xl font-bold">Some Metric 1</dt>
-            <dd className="text-xl mt-2 text-md text-gray-500">{selectedReport.someMetric1}</dd>
+            <dt className="text-xl sm:text-2xl font-bold">Stage</dt>
+            <dd className="text-xl mt-2 text-md text-gray-500">{getValueLabel('stage', selectedReport.stage)}</dd>
           </div>
           <div className="border-t border-gray-200 pt-4">
-            <dt className="text-xl sm:text-2xl font-bold">Some Metric 2</dt>
-            <dd className="text-xl mt-2 text-md text-gray-500">{selectedReport.someMetric2}</dd>
+            <dt className="text-xl sm:text-2xl font-bold">Sectors</dt>
+            <dd className="text-xl mt-2 text-md text-gray-500">{getValueLabel('sectors', selectedReport.sectors)}</dd>
           </div>
           <div>
           </div>
