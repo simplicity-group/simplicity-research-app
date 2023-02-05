@@ -147,13 +147,19 @@ const Reports = () => {
   const handleFilterChange = (e) => {
     let filterId = e.target.id;
     const selectedFilter = filterId.split('-');
-    reportFilters[selectedFilter[2]].options[selectedFilter[3]].checked = e.target.checked
+
+    if(selectedFilter.includes('mobile')){
+      reportFilters[selectedFilter[3]].options[selectedFilter[4]].checked = e.target.checked
+    }
+    else{
+      reportFilters[selectedFilter[2]].options[selectedFilter[3]].checked = e.target.checked
+    }
+
     filterReports();
   };
 
   function selectReport(report){
     setSelectedReport(report);
-    //localStorage.setItem("selectedReport", JSON.stringify(report));
   }
   
   return (
@@ -179,7 +185,7 @@ const Reports = () => {
               as={Fragment}
               enter="transition ease-in-out duration-300 transform"
               enterFrom="translate-x-0 opacity-0"
-              enterTo="translate-x-0 opacity-100"
+              enterTo="translate-x-100 opacity-100"
               leave="transition ease-in-out duration-100 transform"
               leaveFrom="translate-x-0 opacity-100"
               leaveTo="opacitiy-0"

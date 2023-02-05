@@ -7,9 +7,24 @@ const SpecificReport = () => {
 
   var {selectedReport, setOnSpecificReport} = UserAuth();
 
+  console.log(selectedReport.downloadURL)
+
   function backToReports(){
     setOnSpecificReport(true);
     navigate('/reports');
+  }
+
+  function downloadReport(){
+    console.log(selectedReport)
+    fetch(selectedReport.downloadURL).then(res => res.blob()).then(file => {
+      let tempUrl = URL.createObjectURL(file);
+      let aTag = document.createElement("a");
+      aTag.href = tempUrl;
+      aTag.download = "filename";
+      document.body.appendChild(aTag);
+      aTag.click();
+      aTag.remove();
+    })
   }
 
   return (
@@ -33,17 +48,26 @@ const SpecificReport = () => {
           <p className="mt-4 mb-4 text-gray-500">
             {selectedReport.summary}
           </p>
-          <button 
-            className='flex mb-2 mt-2  pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'>
-            Download Report &nbsp;
-            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-file-download" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#ffffff" fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-              <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-              <line x1="12" y1="11" x2="12" y2="17" />
-              <polyline points="9 14 12 17 15 14" />
-            </svg>
-          </button>
+          { selectedReport.downloadURL &&
+          <a href={selectedReport.downloadURL} download="Report" target="_blank">
+            <button 
+              className='flex mb-2 mt-2  pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
+              >
+              Download Report &nbsp;
+              <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-file-download" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#ffffff" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                <line x1="12" y1="11" x2="12" y2="17" />
+                <polyline points="9 14 12 17 15 14" />
+              </svg>
+            </button>
+          </a>
+          }
+          { !selectedReport.downloadURL &&
+            <p className='m-auto text-gray-500'>no report document provided &nbsp; ╮(●︿●)╭</p> 
+          }
+
         </div>
 
         <div className=" grid grid-cols- grid-rows-2 gap-4 sm:gap-6 lg:gap-8">

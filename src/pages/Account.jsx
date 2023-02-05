@@ -1,28 +1,26 @@
 import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
-import { useAuth, upload } from '../firebase';
-import { useEffect } from 'react';
+import { updateUserProfile, upload } from '../firebase';
 import Select from 'react-select';
 
 const Account = () => {
 
-  console.log('account')
-
-  const {filters, user, logout, profile, profilePic, changeProfilePic} = UserAuth();
+  const {filters, user, profile, logout, profilePic, changeProfilePicture} = UserAuth();
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
+  const [profileChanged, setProfileChanged] = useState(false)
+  const [selectedSectors, setSelectedSectors] = useState(profile.sectorsInterest);
+  const [selectedStages, setSelectedStages] = useState(profile.stagesInterest);
 
-  const [selectedSectors, setSelectedSectors] = useState(null);
   localStorage.setItem("sectorOptions", JSON.stringify(filters[0].options));
   const sectorOptions = JSON.parse(localStorage.getItem("sectorOptions"));;
   for (var i = 0; i < sectorOptions.length; i++){
     delete sectorOptions[i].checked;
   }
 
-  const [selectedStages, setSelectedStages] = useState(null);
   localStorage.setItem("stageOptions", JSON.stringify(filters[2].options));
   const stageOptions = JSON.parse(localStorage.getItem("stageOptions"));;
   for (var i = 0; i < stageOptions.length; i++){
@@ -39,12 +37,16 @@ const Account = () => {
   function providePhoto(e){
     if(e.target.files[0]) {
       setPhoto(e.target.files[0])
+      setProfileChanged(true);
     }
   }
 
-  async function uploadPhoto() {
-    const photoURL = await upload(photo, user, loading);
-    changeProfilePicture(photoURL)
+  async function saveProfileChanges() {
+    setLoading(true);
+    const photoURL = await updateUserProfile(user, profile, photo, selectedStages ,selectedSectors);
+    changeProfilePicture(photoURL);
+    setLoading(false);
+    setProfileChanged(false);
   }
 
   const handleLogout = async () => {
@@ -56,12 +58,14 @@ const Account = () => {
     }
   }
 
-  // handle onChange event of the dropdown
   const handleSectorsChange = e => {
     setSelectedSectors(e);
+    setProfileChanged(true);
   }
+
   const handleStagesChange = e => {
     setSelectedStages(e);
+    setProfileChanged(true);
   }
 
   return (
@@ -102,7 +106,7 @@ const Account = () => {
                     isMulti
                     placeholder="Select Stage(s)"
                     value={selectedStages} 
-                    options={stageOptions} // list of the data
+                    options={stageOptions}
                     onChange={handleStagesChange}
                   />
                 </div>
@@ -114,7 +118,7 @@ const Account = () => {
                     isMulti
                     placeholder="Select Sector(s)"
                     value={selectedSectors} 
-                    options={sectorOptions} // list of the data
+                    options={sectorOptions}
                     onChange={handleSectorsChange}
                   />
                 </div>
@@ -128,10 +132,21 @@ const Account = () => {
                     </button>
                   </div>
                   <div className='flex-1 flex justify-end'>
-                    <button type="submit" className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900"
-                      disabled={loading || !photo}
-                      onClick={uploadPhoto}>
-                      Save
+                    <button type="button" className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:bg-gray-200 disabled:hover:bg-gray-200 disabled:text-gray-400 disabled:hover:shadow-none disabled:cursor-not-allowed"
+                      disabled={profileChanged === false}
+                      onClick={() => saveProfileChanges()}>
+                      { loading === false &&
+                      <p>Save</p>
+                      }
+                      { loading === true &&
+                      <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                      </svg>
+                      }
                     </button>
                   </div>
                 </div>

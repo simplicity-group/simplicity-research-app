@@ -1,22 +1,76 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Fragment, useState } from 'react'
 import RequestCard from '../components/requests/RequestCard.jsx'
-import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
+import { Dialog, Disclosure, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
 import { Link } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import { getRequests } from '../firebase.js';
+import LoadingData from '../components/general/LoadingData';
 
 const Requests = () => {
 
-  var {filters, requestsLoading, setRequestsLoading, requestsData, setRequestsData, setSelectedRequest} = UserAuth();
-
-  localStorage.setItem("requestFilters", JSON.stringify(filters));
-  var requestFilters = JSON.parse(localStorage.getItem("requestFilters"));
-
+  var {filters, requestsLoading, setRequestsLoading, requestsData, setRequestsData, setSelectedRequest, onSpecificRequest, setOnSpecificRequest} = UserAuth();
+  const [requestFilters, setRequestFilters] = useState([])
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [visible, setVisible] = useState(21);
-  
+  const [filteredRequests, setFilteredRequests] = useState(requestsData);
+
+  useEffect(() => {
+    if(!onSpecificRequest){
+      getRequestsData();
+    }
+    else{
+      setOnSpecificRequest(false);
+    }
+    localStorage.setItem("requestFilters", JSON.stringify(filters));
+    var requestFilters = JSON.parse(localStorage.getItem("requestFilters"));
+     
+    //Temporary until filters are more defined (this is done to keep the same index number for reference in front-end ids for STATUS filters)
+    delete requestFilters[0]
+    delete requestFilters[1]
+    delete requestFilters[2]
+    setRequestFilters(requestFilters)
+  }, [])
+
+  const getRequestsData = async () => {
+    setRequestsLoading(true);
+    setRequestsData(await getRequests());
+    setRequestsLoading(false);
+  }
+
+  const filterRequests = () => {
+    setRequestsLoading(true);
+    localStorage.setItem("requestFiltersTrue", JSON.stringify(requestFilters));
+    var requestFiltersTrue = JSON.parse(localStorage.getItem("requestFiltersTrue"));
+
+    //Get checked filters
+    //TEMPORARY
+    for (var i = 3; i < requestFiltersTrue.length; i++){
+      for (var x = 0; x < requestFiltersTrue[i].options.length; x++){
+        delete requestFiltersTrue[i].options[x].label
+        if(requestFiltersTrue[i].options[x].checked === false){
+          delete requestFiltersTrue[i].options[x]
+        }
+        else{
+          delete requestFiltersTrue[i].options[x].checked
+        }
+      }
+    }
+    
+    //Split filters
+    var statusFilter = requestFiltersTrue[3].options
+    let statusFilterMapped = statusFilter.map(status => { return status.value });
+
+    //Filter for status
+    setFilteredRequests(requestsData.filter(request => {
+      return statusFilterMapped.includes(request.status)
+    }));
+
+    setRequestsLoading(false);
+  };
+
   const showMoreRequests = () => {
     if (visible < requestsData.length){
       setVisible((prevValue) => prevValue + 8);
@@ -24,8 +78,9 @@ const Requests = () => {
   };
 
   const unselectAll = () => {
-    let i = 0;
-    for (i = 0; i < requestFilters.length; i++){
+    //TEMPORARY
+    let i = 3;
+    for (i = 3; i < requestFilters.length; i++){
       let f = 0;
       for (f = 0; f < requestFilters[i].options.length; f++){
         let checkboxId = 'request-filter-' + i + '-' + f
@@ -33,12 +88,12 @@ const Requests = () => {
         document.getElementById(checkboxId).checked = false;
       }
     }
-    filterReports();
+    filterRequests();
   };
 
   const unselectAllMobile = () => {
-    let i = 0;
-    for (i = 0; i < requestFilters.length; i++){
+    let i = 3;
+    for (i = 3; i < requestFilters.length; i++){
       let f = 0;
       for (f = 0; f < requestFilters[i].options.length; f++){
         let checkboxId = 'request-filter-mobile-' + i + '-' + f
@@ -46,12 +101,12 @@ const Requests = () => {
         document.getElementById(checkboxId).checked = false;
       }
     }
-    filterReports();
+    filterRequests();
   };
 
   const selectAll = () => {
-    let i = 0;
-    for (i = 0; i < requestFilters.length; i++){
+    let i = 3;
+    for (i = 3; i < requestFilters.length; i++){
       let f = 0;
       for (f = 0; f < requestFilters[i].options.length; f++){
         let checkboxId = 'request-filter-' + i + '-' + f
@@ -59,12 +114,12 @@ const Requests = () => {
         document.getElementById(checkboxId).checked = true;
       }
     }
-    filterReports();
+    filterRequests();
   };
 
   const selectAllMobile = () => {
-    let i = 0;
-    for (i = 0; i < requestFilters.length; i++){
+    let i = 3;
+    for (i = 3; i < requestFilters.length; i++){
       let f = 0;
       for (f = 0; f < requestFilters[i].options.length; f++){
         let checkboxId = 'request-filter-mobile-' + i + '-' + f
@@ -72,24 +127,27 @@ const Requests = () => {
         document.getElementById(checkboxId).checked = true;
       }
     }
-    filterReports();
+    filterRequests();
   };
 
   const handleFilterChange = (e) => {
     let filterId = e.target.id;
     const selectedFilter = filterId.split('-');
-    requestFilters[selectedFilter[2]].options[selectedFilter[3]].checked = e.target.checked
-    filterReports();
-  };
+    
+    //TEMPORARY FILTERS IS ONLY STATUS - ELEMENT 3
+    if(selectedFilter.includes('mobile')){
+      requestFilters[3].options[selectedFilter[4]].checked = e.target.checked
+    }
+    else{
+      requestFilters[3].options[selectedFilter[3]].checked = e.target.checked
+    }
 
-  const filterReports = () => {
-    console.log('Searching with new filter...')
-    console.log(requestFilters)
+
+    filterRequests();
   };
 
   function selectRequest(request){
     setSelectedRequest(request);
-    //localStorage.setItem("selectedRequest", JSON.stringify(request));
   }
   
   return (
@@ -115,7 +173,7 @@ const Requests = () => {
               as={Fragment}
               enter="transition ease-in-out duration-300 transform"
               enterFrom="translate-x-0 opacity-0"
-              enterTo="translate-x-0 opacity-100"
+              enterTo="translate-x-100 opacity-100"
               leave="transition ease-in-out duration-100 transform"
               leaveFrom="translate-x-0 opacity-100"
               leaveTo="opacitiy-0"
@@ -165,7 +223,7 @@ const Requests = () => {
                   </button>
                 <form className="mt-4 border-t border-gray-200">
 
-                  {filters.map((section) => (
+                  {requestFilters.map((section) => (
                     <Disclosure defaultOpen as="div" key={section.id} className="border-t border-gray-200 px-4 py-4">
                       {({ open }) => (
                         <>
@@ -270,7 +328,7 @@ const Requests = () => {
                 </button>
               </div>
               <form className="">
-                {filters.map((section) => (
+                {requestFilters.map((section) => (
                   <Disclosure defaultOpen as="div" key={section.id} className="border-b border-gray-200 py-5">
                     {({ open }) => (
                       <>
@@ -321,8 +379,11 @@ const Requests = () => {
           {/* Request grid */}
           <div className="flex-1 flex bg-gray-100">
             <div className='flex-1 p-6 '>
-              <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                  {requestsData.slice(0, visible).map(request => (
+            {
+              requestsLoading
+              ? <LoadingData/>
+              : <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredRequests.slice(0, visible).map(request => (
                     <div key={request.id} onClick={() => selectRequest(request)}>
                       <RequestCard 
                         id={request.id}
@@ -332,7 +393,8 @@ const Requests = () => {
                     </div>
                   ))}
               </div>
-              {visible <= requestsData.length && 
+            }
+              {visible <= filteredRequests.length && 
                 <div className='w-100 flex'>
                   <button 
                     className='m-auto pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
@@ -341,12 +403,12 @@ const Requests = () => {
                   </button>
                 </div>
               } 
-              {requestsData.length > 0 && visible > requestsData.length &&
+              {filteredRequests.length > 0 && visible > filteredRequests.length &&
               <div className='w-100 flex'>
                 <p className='m-auto text-gray-500'>no more requests</p> 
               </div>
               }
-              {requestsData.length == 0 && visible > requestsData.length &&
+              {filteredRequests.length == 0 && visible > filteredRequests.length &&
               <div className='w-100 flex'>
                 <p className='m-auto text-gray-500'>no results &nbsp; ╮(●︿●)╭</p> 
               </div>

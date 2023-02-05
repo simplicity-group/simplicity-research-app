@@ -2,7 +2,7 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, updateProfile} from "firebase/auth";
 import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
-import { getFirestore, collection, getDocs, getDoc, doc, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc } from 'firebase/firestore';
 import {v4} from 'uuid';
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -46,15 +46,26 @@ export async function getReports(){
     const reportsRef = collection(db, "reports")
     var data = await getDocs(reportsRef);
     allReports = data.docs.map((doc) => ({...doc.data(), id: doc.id}));
-    return allReports
+
+    //Valid data only
+    var filteredReports = allReports.filter(report => {
+        return (report.name !== '' && report.name !== null && report.rating !== '' && report.rating !== null)
+    });
+    return filteredReports
 }
 
-export async function getRequests(filter){
+export async function getRequests(){
     var allRequests = []
     const requestsRef = collection(db, "requests")
     var data = await getDocs(requestsRef);
     allRequests = data.docs.map((doc) => ({...doc.data(), id: doc.id}));
-    return allRequests
+
+    //Valid data only
+    var filteredRequests = allRequests.filter(request => {
+        return (request.name !== '' && request.name !== null && request.status !== '' && request.status !== null)
+    });
+
+    return filteredRequests
 }
 
 export async function submitRequest(projectName, projectWebsite, pitchdeck, whitepaper){
@@ -81,6 +92,63 @@ export async function submitRequest(projectName, projectWebsite, pitchdeck, whit
     
     } catch (e) {
         alert(e);
+    }
+}
+
+export async function completeAccount(user, profile, photo, selectedStages, selectedSectors){
+
+    const userstoreRef = collection(db, "userstore")
+
+    if(profile){
+        const docRef = doc(userstoreRef, profile.id);
+        //setting row that already exists
+        try {
+          await updateDoc(docRef, {
+            profileComplete: true,
+            stagesInterest: selectedStages,
+            sectorsInterest: selectedSectors
+          });
+          const photoURL = await upload(photo, user);
+
+          return photoURL;
+        }
+        catch (e) {
+          alert(e.message)
+        }
+      }
+      else{
+        //creating new profile row
+        try{
+          await setDoc(doc(userstoreRef, user.uid), {
+            fname:'', 
+            lname:'', 
+            profileComplete: true, 
+            stagesInterest: selectedStages, 
+            sectorsInterest: selectedSectors 
+        }); 
+            const photoURL = await upload(photo, user);
+
+          return photoURL;
+        } catch (e) {
+          console.log(e.message)
+        }
+      }
+}
+
+export async function updateUserProfile(user, profile, photo, selectedStages, selectedSectors){
+    const userstoreRef = collection(db, "userstore")
+    const docRef = doc(userstoreRef, profile.id);
+    try {
+        await updateDoc(docRef, {
+          stagesInterest: selectedStages,
+          sectorsInterest: selectedSectors
+        });
+        const photoURL = await upload(photo, user);
+
+        return photoURL;
+    }
+        catch (e) {
+        alert(e.message)
     }
 }
 

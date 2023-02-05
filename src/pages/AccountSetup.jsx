@@ -1,24 +1,23 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
-import { upload, db } from '../firebase';
+import { upload, db, completeAccount } from '../firebase';
 import FixRequiredSelect from '../components/general/FixRequiredSelect';
 import BaseSelect from 'react-select';
 import { doc, collection, addDoc, setDoc, updateDoc } from 'firebase/firestore'
 import filters from '../data/filters'
 
 const Select = props => (
-    <FixRequiredSelect
-      {...props}
-      SelectComponent={BaseSelect}
-      options={props.options || options}
-    />
+  <FixRequiredSelect
+    {...props}
+    SelectComponent={BaseSelect}
+    options={props.options || options}
+  />
 );
 
 const AccountSetup = () => {
 
-  const { user, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete} = UserAuth();
-  const userstoreRef = collection(db, "userstore")
+  const {user, profile, getCurrentUserProfile, profilePic, changeProfilePicture, changeUserComplete} = UserAuth();
   const navigate = useNavigate();
     
   const [loading, setLoading] = useState(false);
@@ -54,48 +53,19 @@ const AccountSetup = () => {
 
   const completeProfile = async (e) => { 
     e.preventDefault();
-    if(profile){
-      const docRef = doc(userstoreRef, profile.id);
-      try {
-        await updateDoc(docRef, {
-          profileComplete: true,
-          stagesInterest: selectedStages,
-          sectorsInterest: selectedSectors
-        });
+    setLoading(true);
+    const photoURL = await completeAccount(user, profile, photo, selectedStages, selectedSectors);
+    await getCurrentUserProfile(user);
+    changeUserComplete(true);
+    changeProfilePicture(photoURL);
+    setLoading(false);
 
-        setLoading(true);
-        const photoURL = await upload(photo, user, loading);
-        changeProfilePicture(photoURL)
-        setLoading(false);
-
-        changeUserComplete(true);
-        navigate('/home');
-      }
-      catch (e) {
-        console.log(e.message)
-      }
-    }
-    else{
-      try{
-        await setDoc(doc(userstoreRef, user.uid), { fname:null, lname:null, profileComplete: true, stagesInterest: selectedStages, sectorsInterest: selectedSectors } );
-
-        setLoading(true);
-        const photoURL = await upload(photo, user, loading);
-        changeProfilePicture(photoURL)
-        setLoading(false);
-
-        changeUserComplete(true);
-        navigate('/home');
-      } catch (e) {
-        console.log(e.message)
-      }
-    }
+    navigate('/home');
   }
 
   function providePhoto(e){
     if(e.target.files[0]) {
       setPhoto(e.target.files[0])
-      console.log(photo)
     }
   }
 
@@ -160,8 +130,20 @@ const AccountSetup = () => {
                       className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:bg-gray-200 disabled:text-gray-400 disabled:hover:shadow-none disabled:cursor-not-allowed"
                       type="submit" 
                       onClick={completeProfile}
-                      disabled={!selectedStages && !selectedSectors}
-                    >Complete Account
+                      disabled={(selectedStages === null || selectedStages.length === 0) || (selectedSectors === null || selectedSectors.length === 0 ) }
+                    >
+                      { loading === false &&
+                      <p>Complete Account</p>
+                      }
+                      { loading === true &&
+                      <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                      </svg>
+                      }
                   </button>
                 </div>
               </div>

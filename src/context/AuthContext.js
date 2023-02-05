@@ -20,6 +20,7 @@ export const AuthContextProvider = ({ children }) => {
     var [userComplete, setUserComplete] = useState(null)
     var [profilePic, setProfilePicture] = useState('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png')
 
+    var [filtersLoading, setFiltersLoading] = useState(true)
     var [filters, setFilters] = useState([])
 
     var [selectedReport , setSelectedReport] = useState([])
@@ -58,20 +59,16 @@ export const AuthContextProvider = ({ children }) => {
 
         if(currentUserProfile[0]){
             setProfile(currentUserProfile[0])
-            console.log('HAS RECORD:')
             if(currentUserProfile[0].profileComplete === true){
-                console.log('PROFILE COMPLETE')
                 setUserComplete(true)
                 return
             }
             else{
-                console.log('PROFILE NOT COMPLETE')
                 setUserComplete(false)
                 return
             }
         }
         else{
-            console.log('DOES NOT HAVE RECORD')
             setProfile(null)
             setUserComplete(false)
         }
@@ -80,6 +77,7 @@ export const AuthContextProvider = ({ children }) => {
     var fetchFilters = async () => {
         filters = await getFilters();
         setFilters(filters)
+        setFiltersLoading(false);
     }
 
     var fetchReports = async () => {
@@ -116,7 +114,7 @@ export const AuthContextProvider = ({ children }) => {
     }, [])
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest}}>
+        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest}}>
             {children}
         </UserContext.Provider>
     );
