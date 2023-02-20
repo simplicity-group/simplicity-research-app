@@ -1,9 +1,10 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { AuthContextProvider, UserAuth } from '../../context/AuthContext';
+import { UserAuth } from '../../context/AuthContext';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../images/sr_logo.svg'
+import SRCoin from '../../images/coin.svg'
 
 const navigation = [
   { name: 'Reports', href: '/reports', current: false },
@@ -17,7 +18,7 @@ function classNames(...classes) {
 export default function Navbar() {
   const navigate = useNavigate();
 
-  const {user, userComplete, profilePic, reportsData, setSelectedReport, requestsData, setSelectedRequest} = UserAuth();
+  const {user, userComplete, profilePic, reportsData, setSelectedReport, requestsData, setSelectedRequest, profileTokens} = UserAuth();
 
   //Put report and request arrays together
   const items = reportsData.concat(requestsData)
@@ -162,8 +163,16 @@ export default function Navbar() {
                     </div>
                   </div>
 
+                  {/* Coin */}
+                  <div className='relative justify-center flex items-center m-1 md:ml-3 md:mr-3'>
+                    <div className='m-1 md:m-2 text-sm text-gray-900'>
+                      {profileTokens}
+                    </div>
+                    <img src={SRCoin} className="w-6" />
+                  </div>
+
                   {/* Profile */}
-                  <Menu as="div" className="relative ml-3 h-full">
+                  <Menu as="div" className="relative h-full">
                     <div className='h-full '>
                       <NavLink key='account' to='/account' 
                         className={({ isActive }) => 
@@ -194,7 +203,6 @@ export default function Navbar() {
                               to="/account"
                               className={classNames(active ? 'bg-black text-white' : '', 'block px-4 py-2 text-sm')}
                             >
-                              Your Profile
                             </Link>
                           )}
                         </Menu.Item>

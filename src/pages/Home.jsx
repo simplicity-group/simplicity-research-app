@@ -68,7 +68,7 @@ const Home = () => {
               </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-lg font-semibold text-gray-900">Browse Popular Reports</p>
+                <p className="text-lg font-semibold text-gray-900">Browse All Reports</p>
                 <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
               </div>
           </Link>

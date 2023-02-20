@@ -16,6 +16,7 @@ const Reports = () => {
   const [visible, setVisible] = useState(8);
   const [filteredReports, setFilteredReports] = useState(reportsData);
 
+
   useEffect(() => {
     if(!onSpecificReport){
       getReportsData();
@@ -164,6 +165,7 @@ const Reports = () => {
   
   return (
     <div className='h-full'>
+    
     
       {/* Mobile filter panel */}
       <Transition.Root show={mobileFiltersOpen} as={Fragment}>

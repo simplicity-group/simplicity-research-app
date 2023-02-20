@@ -1,14 +1,14 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
 import {getAuth, updateProfile} from "firebase/auth";
-import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
+import {getDownloadURL, getStorage, ref, uploadBytes, getBlob} from "firebase/storage";
 import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc } from 'firebase/firestore';
 import {v4} from 'uuid';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAUxuAkhANfbtDgf1xfDSR5dLVYxHC6dRQ",
     authDomain: "simplicity-research-app.firebaseapp.com",
@@ -19,21 +19,211 @@ const firebaseConfig = {
     measurementId: "G-NRZ36QV40E"
 };
 
+// Dates
+const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const now = new Date();
+const currentYear = now.getFullYear();
+//const currentMonth = monthNames[now.getMonth()];
+const currentMonth = 'dec'
+
+// Token Data
+const defaultSubscriptionAmount = 20;
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const storage = getStorage();
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
+// Refs
+const userstoreRef = collection(db, "userstore")
+const filtersRef = collection(db, "filters")
+
 export async function getFilters(){
-    var filters = []
-    const filtersRef = collection(db, "filters")
-    var data = await getDocs(filtersRef);
-    filters = data.docs.map((doc) => ({...doc.data(), id: doc.id}));
-    return filters
+  var filters = []
+  var data = await getDocs(filtersRef);
+  filters = data.docs.map((doc) => ({...doc.data(), id: doc.id}));
+  return filters
 }
 
-export async function upload(file, currentUser) {
+export async function transactTokens(cost, uid){
+  const tokensRef = doc(userstoreRef, uid, "tokens", currentYear.toString());
+
+  const currentYearTokens = await getDoc(tokensRef);
+  const currentYearTokensData = currentYearTokens.data()
+  const currentMonthTokens = currentYearTokensData[currentMonth]
+
+  if(currentMonthTokens.remaining >= cost){
+    const newRemaining = currentMonthTokens.remaining - cost;
+
+    await updateDoc(tokensRef, {
+      [currentMonth] : {
+        purchased: currentMonthTokens.purchased,
+        remaining: newRemaining,
+        subscription: defaultSubscriptionAmount
+      }
+    }, 
+    { merge: true }
+    );
+
+    return [true, newRemaining]
+  }
+  else{
+    return false
+  }
+}
+
+export async function updateUserTokens(uid, allTokenData){
+
+  const currentYearTokensRef = doc(userstoreRef, uid, "tokens", currentYear.toString())
+
+  var currentYearTokens = allTokenData.filter(obj => {
+    return obj.year === currentYear.toString()
+  })
+
+  //Current year DOES NOT exist
+  if(currentYearTokens.length <= 0){
+
+    //Get last year
+    const lastYear = currentYear-1;
+    var lastYearTokens = allTokenData.filter(obj => {
+      return obj.year === lastYear.toString()
+    })    
+    
+    //Work out when the last month was logged
+    var lastMonthIndex = 0;
+    //Check through all the months with what is logged on the userstore and get the index of the latest month
+    for (var i = 0; i < monthNames.length; i++){
+      if(lastYearTokens[0][monthNames[i]]){
+        if(lastMonthIndex < i){
+          lastMonthIndex = i;
+        }
+      }
+    }
+
+    const lastMonthObj = lastYearTokens[0][monthNames[lastMonthIndex]]
+    const lengthToEndOfLastYear = 12 - lastMonthIndex-1;
+    const lengthToCurrentMonth = monthNames.indexOf(currentMonth)
+    const differenceBetweenMonths = lengthToEndOfLastYear + lengthToCurrentMonth;
+
+    //If the user hasn't updated token obj for 2 or more months
+    if (differenceBetweenMonths >= 2){
+      additionalRemaining = defaultSubscriptionAmount*2
+      await setDoc(currentYearTokensRef, {
+        [currentMonth] : {
+          purchased: 0,
+          remaining: additionalRemaining,
+          subscription: defaultSubscriptionAmount
+        }
+      }, 
+      { merge: true }
+      );  
+    }
+    //It's only been a month use what they have previously remaining
+    else{
+      if(lastMonthObj.remaining > 20){
+        additionalRemaining = 20
+      }
+      else{
+        additionalRemaining = lastMonthObj.remaining
+      }
+      await setDoc(currentYearTokensRef, {
+        [currentMonth] : {
+          purchased: 0,
+          remaining: defaultSubscriptionAmount+additionalRemaining,
+          subscription: defaultSubscriptionAmount
+        }
+      }, 
+      { merge: true }
+      );        
+    }
+
+  }
+  
+  //Current year DOES exist
+  else{
+    //Work out when the last month was logged
+    var lastMonthIndex = 0;
+    //Check through all the months with what is logged on the userstore and get the index of the latest month
+    for (var i = 0; i < monthNames.length; i++){
+      if(currentYearTokens[0][monthNames[i]]){
+        if(lastMonthIndex < i){
+          lastMonthIndex = i;
+        }
+      }
+    }
+
+    const lastMonthObj = currentYearTokens[0][monthNames[lastMonthIndex]]
+    var additionalRemaining = 0
+    const currentMonthIndex = monthNames.indexOf(currentMonth)
+    const differenceBetweenMonths = currentMonthIndex - lastMonthIndex
+
+    //If the user hasn't updated token obj for 2 or more months
+    if (differenceBetweenMonths >= 2){
+      additionalRemaining = defaultSubscriptionAmount*2
+      await setDoc(currentYearTokensRef, {
+        [currentMonth] : {
+          purchased: 0,
+          remaining: additionalRemaining,
+          subscription: defaultSubscriptionAmount
+        }
+      }, 
+      { merge: true }
+      );  
+    }
+    //It's only been a month use what they have previously remaining
+    else{
+      if(lastMonthObj.remaining > 20){
+        additionalRemaining = 20
+      }
+      else{
+        additionalRemaining = lastMonthObj.remaining
+      }
+      await setDoc(currentYearTokensRef, {
+        [currentMonth] : {
+          purchased: 0,
+          remaining: defaultSubscriptionAmount+additionalRemaining,
+          subscription: defaultSubscriptionAmount
+        }
+      }, 
+      { merge: true }
+      );        
+    }
+  }
+  return additionalRemaining
+}
+
+export async function getUserTokens(uid){
+  
+  //Get all token history 
+  const allTokensRef = collection(userstoreRef, uid, "tokens")
+  const allTokens = await getDocs(allTokensRef);
+  const allTokenData = allTokens.docs.map((doc) => ({year: doc.id, ...doc.data()}));
+
+  //Get current year doc
+  var currentYearTokens = allTokenData.filter(obj => {
+    return obj.year === currentYear.toString()
+  })
+  //console.log('current year:', currentYearTokens[0])
+
+  //Get current month obj
+  if(currentYearTokens[0]){
+    var currentMonthTokens = currentYearTokens[0][currentMonth]
+    //console.log('current month:', currentMonthTokens)
+  }
+ 
+  //If current month exists
+  if (currentMonthTokens){
+    return currentMonthTokens.remaining
+  }
+  else{
+    //call update user tokens to ensure the user has a current month value
+    return await updateUserTokens(uid, allTokenData);
+  }
+    
+}
+
+export async function upload(file) {
     const fileRef = ref(storage, `userstorage/profilepictures/${v4()}`);
     const snapshot = await uploadBytes(fileRef, file);
     const photoURL = await getDownloadURL(fileRef);
@@ -54,89 +244,120 @@ export async function getReports(){
     return filteredReports
 }
 
-export async function getRequests(){
+export async function getRequests(uid){
     var allRequests = []
     const requestsRef = collection(db, "requests")
     var data = await getDocs(requestsRef);
+
     allRequests = data.docs.map((doc) => ({...doc.data(), id: doc.id}));
 
     //Valid data only
     var filteredRequests = allRequests.filter(request => {
-        return (request.name !== '' && request.name !== null && request.status !== '' && request.status !== null)
+        return (request.owner === uid && request.name !== '' && request.name !== null && request.status !== '' && request.status !== null)
     });
 
     return filteredRequests
 }
 
-export async function submitRequest(projectName, projectWebsite, pitchdeck, whitepaper){
+export async function submitRequest(uid, projectName, projectWebsite, pitchdeck, whitepaper){
 
     const requestsRef = collection(db, "requests")
     
     try{
+
         //Pitchdeck
-        const pitchdeckRef = ref(storage, `requestsstorage/pitchdecks/${v4()}`)
-        await uploadBytes(pitchdeckRef, pitchdeck);
-        const pitchdeckURL = await getDownloadURL(pitchdeckRef);
-        
+        var pitchdeckURL = ''
+        if(pitchdeck){
+          const pitchdeckRef = ref(storage, `requestsstorage/pitchdecks/${v4()}`)
+          await uploadBytes(pitchdeckRef, pitchdeck);
+          pitchdeckURL = await getDownloadURL(pitchdeckRef);
+        }
+      
         //Whitepaper
-        const whitepaperRef = ref(storage, `requestsstorage/whitepapers/${v4()}`)
-        await uploadBytes(whitepaperRef, whitepaper);
-        const whitepaperURL = await getDownloadURL(whitepaperRef);
+        var whitepaperURL = ''
+        if(whitepaper){
+          const whitepaperRef = ref(storage, `requestsstorage/whitepapers/${v4()}`)
+          await uploadBytes(whitepaperRef, whitepaper);
+          const whitepaperURL = await getDownloadURL(whitepaperRef);
+        }
 
         //Request document
-        const requestDocResponse = await addDoc(requestsRef, { name:projectName, status: 'in_progress', website:projectWebsite, whitepaperURL: whitepaperURL, pitchdeckURL: pitchdeckURL });
+        const requestDocResponse = await addDoc(requestsRef, { name:projectName, status: 'in_progress', website:projectWebsite, whitepaperURL: whitepaperURL, pitchdeckURL: pitchdeckURL, owner: uid });
         const requestDocRef = doc(db, 'requests', requestDocResponse.id)
         const requestDoc = await getDoc(requestDocRef);
-        
+
         return requestDoc.data()
     
     } catch (e) {
         alert(e);
+        return null
     }
 }
 
 export async function completeAccount(user, profile, photo, selectedStages, selectedSectors){
 
-    const userstoreRef = collection(db, "userstore")
+  if(profile){
+      const docRef = doc(userstoreRef, profile.id);
+      const tokensRef = doc(userstoreRef, profile.id, "tokens", currentYear.toString());
 
-    if(profile){
-        const docRef = doc(userstoreRef, profile.id);
-        //setting row that already exists
-        try {
-          await updateDoc(docRef, {
-            profileComplete: true,
-            stagesInterest: selectedStages,
-            sectorsInterest: selectedSectors
-          });
-          const photoURL = await upload(photo, user);
+      //Setting profile doc that already exists
+      try {
+        await updateDoc(docRef, {
+          profileComplete: true,
+          stagesInterest: selectedStages,
+          sectorsInterest: selectedSectors
+        });
 
-          return photoURL;
-        }
-        catch (e) {
-          alert(e.message)
-        }
+        await setDoc(tokensRef, {
+          [currentMonth] : {
+            purchased: 0,
+            remaining: 20,
+            subscription: 20
+          }
+        }, 
+        { merge: true }
+        );  
+        
+        const photoURL = await upload(photo, user);
+        return photoURL;
       }
-      else{
-        //creating new profile row
-        try{
-          await setDoc(doc(userstoreRef, user.uid), {
-            fname:'', 
-            lname:'', 
-            profileComplete: true, 
-            stagesInterest: selectedStages, 
-            sectorsInterest: selectedSectors 
+      catch (e) {
+        console.warn(e.message);
+      }
+    }
+    else{
+
+      //Creating new profile doc
+      try{
+        await setDoc(doc(userstoreRef, user.uid), {
+          fname:'', 
+          lname:'', 
+          profileComplete: true, 
+          stagesInterest: selectedStages, 
+          sectorsInterest: selectedSectors 
         }); 
-            const photoURL = await upload(photo, user);
 
-          return photoURL;
-        } catch (e) {
-          console.log(e.message)
-        }
+        const tokensRef = doc(userstoreRef, user.uid, "tokens", currentYear.toString());
+
+        await setDoc(tokensRef, {
+          [currentMonth] : {
+            purchased: 0,
+            remaining: 20,
+            subscription: 20
+          }
+        }, 
+        { merge: true }
+        );
+
+        const photoURL = await upload(photo, user);
+        return photoURL;
+      } catch (e) {
+        console.warn(e.message)
       }
+    }
 }
 
 export async function updateUserProfile(user, profile, photo, selectedStages, selectedSectors){
-    const userstoreRef = collection(db, "userstore")
     const docRef = doc(userstoreRef, profile.id);
     try {
         await updateDoc(docRef, {

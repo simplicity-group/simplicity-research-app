@@ -3,14 +3,11 @@ import {signInWithEmailAndPassword,
         signOut, 
         onAuthStateChanged,
 } from 'firebase/auth'
-import {auth} from '../firebase'
-import { db } from '../firebase';
-import { getFilters, getRequests, getReports } from '../firebase';
+import { getFilters, getRequests, getReports, db, auth, getUserTokens } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore'
 
 var userstoreData = []
 const userstoreRef = collection(db, "userstore")
-
 const UserContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
@@ -19,6 +16,8 @@ export const AuthContextProvider = ({ children }) => {
     var [profile, setProfile] = useState({})
     var [userComplete, setUserComplete] = useState(null)
     var [profilePic, setProfilePicture] = useState('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png')
+    var [profileTokens, setProfileTokens] = useState(0)
+    var [profileTokensLoading, setProfileTokensLoading] = useState(false)
 
     var [filtersLoading, setFiltersLoading] = useState(true)
     var [filters, setFilters] = useState([])
@@ -32,6 +31,28 @@ export const AuthContextProvider = ({ children }) => {
     var [requestsLoading, setRequestsLoading] = useState(true)
     var [requestsData, setRequestsData] = useState([])
     var [onSpecificRequest, setOnSpecificRequest] = useState(false)
+
+    useEffect(() => {
+        
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+            setUser(currentUser)
+            if(currentUser){
+                getCurrentUserProfile(currentUser);
+                fetchRequests(currentUser.uid)
+                if(currentUser.photoURL){
+                    setProfilePicture(currentUser.photoURL)
+                }
+            }
+        })
+
+        fetchFilters()
+        fetchReports()
+
+        return () => {
+            unsubscribe()
+        }
+    }, [])
 
     const signIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
@@ -60,6 +81,11 @@ export const AuthContextProvider = ({ children }) => {
             setProfile(currentUserProfile[0])
             if(currentUserProfile[0].profileComplete === true){
                 setUserComplete(true)
+                
+                setProfileTokensLoading(true);
+                await fetchTokens(currentUserProfile[0].id)
+                setProfileTokensLoading(false);
+                
                 return
             }
             else{
@@ -85,10 +111,20 @@ export const AuthContextProvider = ({ children }) => {
         setReportsLoading(false);
     }
 
-    var fetchRequests = async () => {
-        requestsData = await getRequests(null);
+    var fetchRequests = async (uid) => {
+        requestsData = await getRequests(uid);
         setRequestsData(requestsData);
         setRequestsLoading(false);        
+    }
+
+    var fetchTokens = async (id) => {
+        const tokens = await getUserTokens(id)
+        if(tokens){
+            setProfileTokens(tokens);
+        }
+        else{
+            setProfileTokens(0);
+        }
     }
 
     var getValueLabel = (group, valueInput) => {
@@ -145,29 +181,8 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
-    useEffect(() => {
-        fetchFilters()
-        fetchReports()
-        fetchRequests()
-
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-            setUser(currentUser)
-            if(currentUser){
-                getCurrentUserProfile(currentUser);
-                if(currentUser.photoURL){
-                    setProfilePicture(currentUser.photoURL)
-                }
-            }
-        })
-
-        return () => {
-            unsubscribe()
-        }
-    }, [])
-
     return (
-        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
+        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
             {children}
         </UserContext.Provider>
     );

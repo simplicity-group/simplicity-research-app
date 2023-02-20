@@ -11,7 +11,7 @@ import LoadingData from '../components/general/LoadingData';
 
 const Requests = () => {
 
-  var {filters, requestsLoading, setRequestsLoading, requestsData, setRequestsData, setSelectedRequest, onSpecificRequest, setOnSpecificRequest, getValueLabel} = UserAuth();
+  var {profile, filters, requestsLoading, setRequestsLoading, requestsData, setRequestsData, setSelectedRequest, onSpecificRequest, setOnSpecificRequest} = UserAuth();
   const [requestFilters, setRequestFilters] = useState([])
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [visible, setVisible] = useState(21);
@@ -36,7 +36,7 @@ const Requests = () => {
 
   const getRequestsData = async () => {
     setRequestsLoading(true);
-    setRequestsData(await getRequests());
+    setRequestsData(await getRequests(profile.id));
     setRequestsLoading(false);
   }
 
@@ -152,7 +152,6 @@ const Requests = () => {
   
   return (
     <div className='h-full'>
-    
       {/* Mobile filter panel */}
       <Transition.Root show={mobileFiltersOpen} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setMobileFiltersOpen}>
@@ -196,7 +195,7 @@ const Requests = () => {
                 </div>
                 <div className='p-3 md:p-6  border-b border-gray-300'>
                     <Link 
-                      to="/newrequest">
+                     to="/newrequest">
                       <div className='flex h-full justify-center items-center text-sm pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'>
                         <div className='h-full justify-center items-center'>
                           New	&nbsp;
@@ -297,7 +296,7 @@ const Requests = () => {
           <div className='hidden flex flex-row md:flex-col md:flex-none md:border-r md:block lg:block lg:flex-col lg:flex-none lg:border-r lg:border-gray-300'>
            <div className='p-3 md:p-6 border-b border-gray-300'>
               <Link 
-                to="/newrequest">
+                to='/newrequest'>
                 <div className='flex h-full justify-center items-center text-sm pl-8 pr-8 pt-2 pb-2	bg-black text-white shadow-sm sm:rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'>
                   <div className='h-full justify-center items-center'>
                     New	&nbsp;

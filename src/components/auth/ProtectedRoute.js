@@ -4,13 +4,13 @@ import { UserAuth } from '../../context/AuthContext'
 import LoadingAuth from '../general/LoadingAuth'
 
 const ProtectedRoute = ({children}) => {
-    const {user, userComplete, filtersLoading, reportsLoading, requestsLoading} = UserAuth();
+    const {user, userComplete, filtersLoading, reportsLoading, requestsLoading, profileTokensLoading} = UserAuth();
 
     if (!user) {
       return <Navigate to='/' />
     }
     else if(user && (userComplete === false || userComplete === null)) {
-      if(userComplete === null || filtersLoading === true || reportsLoading === true || requestsLoading === true){
+      if(userComplete === null || filtersLoading === true || reportsLoading === true || requestsLoading === true || profileTokensLoading === true){
         return <LoadingAuth />
       }
       else if(userComplete === false){

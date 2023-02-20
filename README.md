@@ -1,1 +1,1 @@
-Hello World
+Simplicity Research Application

@@ -1,15 +1,29 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import TransactionModal from '../components/general/TransactionModal';
 
 const SpecificReport = () => {
   const navigate = useNavigate();
 
   var {selectedReport, setOnSpecificReport, getValueLabel} = UserAuth();
+  const [modalOpen, setModalOpen] = useState(false)
+  const [transactionLoading, setTransactionLoading] = useState(false);
 
   function backToReports(){
     setOnSpecificReport(true);
     navigate('/reports');
+  }
+
+  function handleDownload(){
+    setModalOpen(true);
+  }
+
+  async function downloadReport(){
+    const downloadURL = selectedReport.downloadURL;
+    setModalOpen(false);
+    window.open(downloadURL, '_blank');
+    setTransactionLoading(false);
   }
 
   useEffect(() => {
@@ -20,6 +34,16 @@ const SpecificReport = () => {
 
   return (
     <div className='h-full bg-gray-100'>
+
+    <TransactionModal 
+      modalOpen={[modalOpen, setModalOpen]} 
+      transactionLoading={[transactionLoading, setTransactionLoading]}
+      transactionTitle="Download Report"
+      transactionDescription="Downloading this report will transact 1 token from your account, would you like to proceed?"
+      transactionCost={1}
+      postTransactionAction={downloadReport}
+    />
+
     <div className='p-6'>
       <div className='mb-6'>
         <div onClick={() => backToReports()}
@@ -40,20 +64,19 @@ const SpecificReport = () => {
             {selectedReport.summary}
           </p>
           { selectedReport.downloadURL &&
-          <a href={selectedReport.downloadURL} download="Report" target="_blank">
-            <button 
-              className='flex mb-2 mt-2  pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
-              >
+          <button 
+            onClick={() => handleDownload()}
+            className='flex mb-2 mt-2  pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-lg border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900'
+            >
               Download Report &nbsp;
-              <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-file-download" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#ffffff" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                <line x1="12" y1="11" x2="12" y2="17" />
-                <polyline points="9 14 12 17 15 14" />
-              </svg>
-            </button>
-          </a>
+            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-file-download" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#ffffff" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+              <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+              <line x1="12" y1="11" x2="12" y2="17" />
+              <polyline points="9 14 12 17 15 14" />
+            </svg>
+          </button>
           }
           { !selectedReport.downloadURL &&
             <p className='m-auto text-gray-500 text-sm'>no report document provided &nbsp; ╮(●︿●)╭</p> 

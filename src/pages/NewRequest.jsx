@@ -1,39 +1,57 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { UserAuth } from '../context/AuthContext'
-import { submitRequest } from '../firebase';
-import { useEffect } from 'react';
-import { Button, Spinner } from 'react-bootstrap'
+import { UserAuth } from '../context/AuthContext';
+import { submitRequest, getRequests } from '../firebase';
+import TransactionModal from '../components/general/TransactionModal';
 
 const NewRequest = () => {
 
-  const {user, setSelectedRequest} = UserAuth();
+  const {profile, setSelectedRequest, setRequestsData} = UserAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  var [whitepaper, setWhitepaper] = useState('');
-  var [pitchdeck, setPitchdeck] = useState('');
-  var [projectName, setProjectName] = useState('');
-  var [projectWebsite, setProjectWebsite] = useState('')
+  const [transactionLoading, setTransactionLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false)
+  const [whitepaper, setWhitepaper] = useState(null);
+  const [pitchdeck, setPitchdeck] = useState(null);
+  const [projectName, setProjectName] = useState('');
+  const [projectWebsite, setProjectWebsite] = useState('')
 
-  useEffect(() => {
+  function disableSubmit(){
+    if( (modalOpen === true && loading === true) || (projectName === '' || pitchdeck === null && whitepaper === null)){
+      return true
+    }
+    else{
+      return false
+    }
+  }
 
-  }, [])
-
-  
-  const submit = async () =>{
+  function handleSubmit(){
     if(projectName && (pitchdeck || whitepaper)){
       setLoading(true);
-      setSelectedRequest(await submitRequest(projectName, projectWebsite, pitchdeck, whitepaper));
-      navigate('/specificrequest');
-      setLoading(false);
+      setModalOpen(true);
     } else {
       alert('To submit a request you need to provide a project name and either a pitchdeck or whitepaper.')
     }
+  } 
 
+  async function callSubmitRequest(){
+    setSelectedRequest(await submitRequest(profile.id, projectName, projectWebsite, pitchdeck, whitepaper));
+    navigate('/specificrequest'); 
+    setModalOpen(false);
+    setLoading(false);
+    setRequestsData(await getRequests(profile.id));  
   }
 
   return (
     <div className="bg-gray-100 h-full">
+        <TransactionModal 
+          modalOpen={[modalOpen, setModalOpen]}
+          transactionLoading={[transactionLoading, setTransactionLoading]}
+          transactionTitle="New Request"
+          transactionDescription="Making a new request will transact 2 tokens from your account, would you like to proceed?"
+          transactionCost={2}
+          postTransactionAction={callSubmitRequest}
+        />
         <div className="ml-4 mr-4 sm:ml-auto sm:mr-auto bg-gray-100 pt-12 md:pt-20 md:w-3/5 ">
           <form className='bg-white rounded-md'>
             <div className="shadow-md border border-gray-400 rounded-md">
@@ -111,16 +129,19 @@ const NewRequest = () => {
                     />
                 </div>
                 <div className="pt-3 flex justify-between items-center">
+                  <div className="mt-2 flex items-center text-sm text-gray-500">
+                    Submitting a new request will transact 2 tokens from your account.
+                  </div>
                   <div className='flex-1 flex justify-end'>
                     <button type="button"
                       className="inline-flex items-center px-4 py-3 text-sm text-white bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:hover:bg-gray-200 disabled:text-gray-400 disabled:hover:shadow-none"
-                      onClick={() => {submit()}}
-                      disabled={projectName === '' || pitchdeck === '' && whitepaper === ''}
+                      onClick={() => {handleSubmit()}}
+                      disabled={disableSubmit() === true}
                       >
-                      { loading === false &&
+                      { (loading === false || modalOpen === false) &&
                       <p>Submit</p>
                       }
-                      { loading === true &&
+                      { (loading === true && modalOpen === true) &&
                       <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
