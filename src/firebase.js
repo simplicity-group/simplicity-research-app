@@ -10,13 +10,13 @@ import {v4} from 'uuid';
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAUxuAkhANfbtDgf1xfDSR5dLVYxHC6dRQ",
-    authDomain: "simplicity-research-app.firebaseapp.com",
-    projectId: "simplicity-research-app",
-    storageBucket: "simplicity-research-app.appspot.com",
-    messagingSenderId: "675528585352",
-    appId: "1:675528585352:web:07284e7942db12d8fd2f3d",
-    measurementId: "G-NRZ36QV40E"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Dates
@@ -223,11 +223,11 @@ export async function getUserTokens(uid){
     
 }
 
-export async function upload(file) {
+export async function upload(file, user) {
     const fileRef = ref(storage, `userstorage/profilepictures/${v4()}`);
     const snapshot = await uploadBytes(fileRef, file);
     const photoURL = await getDownloadURL(fileRef);
-    updateProfile(currentUser, {photoURL})
+    updateProfile(user, {photoURL})
     return photoURL
 }
 
