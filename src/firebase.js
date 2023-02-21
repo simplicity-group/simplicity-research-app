@@ -23,8 +23,7 @@ const firebaseConfig = {
 const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 const now = new Date();
 const currentYear = now.getFullYear();
-//const currentMonth = monthNames[now.getMonth()];
-const currentMonth = 'dec'
+const currentMonth = monthNames[now.getMonth()];
 
 // Token Data
 const defaultSubscriptionAmount = 20;
