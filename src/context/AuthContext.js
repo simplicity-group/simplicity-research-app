@@ -141,17 +141,42 @@ export const AuthContextProvider = ({ children }) => {
                 if(!labels){
                     return valueInput
                 }
-                return labels
+                return <span className="bg-gray-100 w-full text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{labels}</span>       
             }
 
             //rating
             else if(group === 'rating'){
                 let ratingsMapped = filters[1].options.map(rating => { return rating.value });
                 let index = ratingsMapped.indexOf(valueInput)
+
                 if(index < 0){
                     return valueInput
                 }
-                return filters[1].options[index].label
+
+                if(filters[1].options[index].label){
+
+                    var ratingLabel = filters[1].options[index].label
+
+                    if(ratingLabel === 'Red'){
+                        return <span className="bg-red-600 text-red-100 mr-2 px-2.5 py-0.5 rounded">Red</span>
+                    }
+                    else if(ratingLabel === 'Amber/Red'){
+                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded border border-red-600">Amber/Red</span>
+                    }
+                    else if(ratingLabel == 'Amber'){
+                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded ">Amber</span>
+                    }
+                    else if(ratingLabel == 'Amber/Green'){
+                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded border border-green-600">Amber/Green</span>
+                    }
+                    else if(ratingLabel == 'Green'){
+                        return <span className="bg-green-600 text-green-100 mr-2 px-2.5 py-0.5 rounded">Green</span>
+                    }
+                    else {
+                        return filters[1].options[index].label
+                    }
+                }
+
             }
 
             //stage
@@ -161,7 +186,7 @@ export const AuthContextProvider = ({ children }) => {
                 if(index < 0){
                     return valueInput
                 }
-                return filters[2].options[index].label
+                return <span className="bg-gray-100 text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{filters[2].options[index].label}</span>       
             }
 
             //status
@@ -172,7 +197,18 @@ export const AuthContextProvider = ({ children }) => {
                     return valueInput
                 }
 
-                return filters[3].options[index].label
+                else{
+                    console.log('yes')
+                    var label = filters[3].options[index].label
+                    if(label === 'In Progress'){
+                        return <span className="bg-yellow-500 text-white mr-2 px-2.5 py-0.5 rounded ">{filters[3].options[index].label}</span>
+                    }
+                    else if(label === 'Complete'){
+                        return <span className="bg-green-500 text-white mr-2 px-2.5 py-0.5 rounded">{filters[3].options[index].label}</span>
+                    }
+                }
+
+                return 
             }
         }
         else{
