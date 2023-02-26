@@ -240,7 +240,14 @@ export async function getReports(){
     var filteredReports = allReports.filter(report => {
         return (report.name !== '' && report.name !== null && report.rating !== '' && report.rating !== null)
     });
+
     return filteredReports
+}
+
+export async function getPopularReports(){
+  const popularReportsRef = doc(db, "homepage", "popularreports")
+  const popularReports = await getDoc(popularReportsRef);
+  return popularReports.data();  
 }
 
 export async function getRequests(uid){

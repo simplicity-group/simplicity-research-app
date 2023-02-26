@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import ReportThumbnail from '../components/reports/ReportThumbnail'
 import { UserAuth } from '../context/AuthContext'
 
 const Home = () => {
-  const {profile} = UserAuth();
+  const {profile, popularReportsData, setSelectedReport} = UserAuth();
+
+  function selectReport(report){
+    setSelectedReport(report);
+  }
 
   return (
     <div className="bg-gray-100 h-full justify-center items-center grid grid-cols-1 gap-x-4 pt-10 sm:pt-10 sm:mb-auto sm:px-6 md:pt-10 md:mb-auto lg:mt-auto lg:mb-auto lg:grid-cols-3 lg:px-8">
@@ -80,9 +84,19 @@ const Home = () => {
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl mb-4 ml-6 mt-4">Popular Reports</h2>
           <div className='ml-4 mr-4 mb-8'>
             <div className="grid grid-cols-1 grid-rows-3 gap-2 sm:gap-4 lg:gap-6 m-4 ">
-              <ReportThumbnail/>
-              <ReportThumbnail/>
-              <ReportThumbnail/>
+                {popularReportsData.map(report => (
+                  <div key={report.id} onClick={() => selectReport(report)}>
+                    <ReportThumbnail
+                      id={report.id}
+                      name={report.name} 
+                      rating={report.rating}
+                      stage={report.stage}
+                      sectors={report.sectors}
+                    />
+                  </div>
+                ))}
+
+
             </div>
           </div>
         </div>

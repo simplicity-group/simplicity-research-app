@@ -3,7 +3,7 @@ import {signInWithEmailAndPassword,
         signOut, 
         onAuthStateChanged,
 } from 'firebase/auth'
-import { getFilters, getRequests, getReports, db, auth, getUserTokens } from '../firebase';
+import { getFilters, getRequests, getReports, getPopularReports, db, auth, getUserTokens } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore'
 
 var userstoreData = []
@@ -25,6 +25,7 @@ export const AuthContextProvider = ({ children }) => {
     var [selectedReport , setSelectedReport] = useState([])
     var [reportsLoading, setReportsLoading] = useState(true)
     var [reportsData, setReportsData] = useState([])
+    var [popularReportsData, setPopularReportsData] = useState([])
     var [onSpecificReport, setOnSpecificReport] = useState(false)
 
     var [selectedRequest , setSelectedRequest] = useState([])
@@ -105,8 +106,18 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     var fetchReports = async () => {
+        //Get all reports
         reportsData = await getReports(null);
         setReportsData(reportsData);
+
+        //Get popular reports
+        const popularReportsObj = await getPopularReports();    
+        const popularReportsNames = popularReportsObj.popularreports
+        var filteredPopularReports = reportsData.filter(function (el) {
+            return popularReportsNames.indexOf(el.name) >= 0; 
+        });
+        setPopularReportsData(filteredPopularReports)
+
         setReportsLoading(false);
     }
 
@@ -141,7 +152,7 @@ export const AuthContextProvider = ({ children }) => {
                 if(!labels){
                     return valueInput
                 }
-                return <span className="bg-gray-100 w-full text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{labels}</span>       
+                return <span className="bg-gray-100 text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{labels}</span>       
             }
 
             //rating
@@ -198,7 +209,6 @@ export const AuthContextProvider = ({ children }) => {
                 }
 
                 else{
-                    console.log('yes')
                     var label = filters[3].options[index].label
                     if(label === 'In Progress'){
                         return <span className="bg-yellow-500 text-white mr-2 px-2.5 py-0.5 rounded ">{filters[3].options[index].label}</span>
@@ -217,7 +227,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
+        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, popularReportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
             {children}
         </UserContext.Provider>
     );
