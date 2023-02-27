@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
 import {getAuth, updateProfile} from "firebase/auth";
-import {getDownloadURL, getStorage, ref, uploadBytes, getBlob} from "firebase/storage";
+import {getDownloadURL, getStorage, ref, uploadBytes, uploadString} from "firebase/storage";
 import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc } from 'firebase/firestore';
 import {v4} from 'uuid';
 
@@ -224,8 +224,10 @@ export async function getUserTokens(uid){
 
 export async function upload(file, user) {
     const fileRef = ref(storage, `userstorage/profilepictures/${v4()}`);
-    const snapshot = await uploadBytes(fileRef, file);
+    await uploadString(fileRef, file, 'data_url')
+    //const snapshot = await uploadBytes(fileRef, file);
     const photoURL = await getDownloadURL(fileRef);
+
     updateProfile(user, {photoURL})
     return photoURL
 }
@@ -240,7 +242,14 @@ export async function getReports(){
     var filteredReports = allReports.filter(report => {
         return (report.name !== '' && report.name !== null && report.rating !== '' && report.rating !== null)
     });
+
     return filteredReports
+}
+
+export async function getPopularReports(){
+  const popularReportsRef = doc(db, "homepage", "popularreports")
+  const popularReports = await getDoc(popularReportsRef);
+  return popularReports.data();  
 }
 
 export async function getRequests(uid){

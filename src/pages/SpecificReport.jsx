@@ -52,7 +52,7 @@ const SpecificReport = () => {
             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
             <polyline points="15 6 9 12 15 18" />
           </svg>
-          <p className='justify-center'>Back to Reports</p>
+          <p className='justify-center'>All Reports</p>
         </div>
       </div>
 

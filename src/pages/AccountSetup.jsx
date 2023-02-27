@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
-import { upload, db, completeAccount } from '../firebase';
+import { completeAccount } from '../firebase';
 import FixRequiredSelect from '../components/general/FixRequiredSelect';
 import BaseSelect from 'react-select';
-import { doc, collection, addDoc, setDoc, updateDoc } from 'firebase/firestore'
 import filters from '../data/filters'
+import AvatarCropperModal from '../components/general/AvatarCropperModal';
 
 const Select = props => (
   <FixRequiredSelect
@@ -19,9 +19,11 @@ const AccountSetup = () => {
 
   const {user, profile, getCurrentUserProfile, profilePic, changeProfilePicture, changeUserComplete} = UserAuth();
   const navigate = useNavigate();
-    
+  const [cropperOpen, setCropperOpen] = useState(false)
   const [loading, setLoading] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(profilePic);
   const [photo, setPhoto] = useState(null);
+  const [profileChanged, setProfileChanged] = useState(false)
   const hiddenFileInput = React.useRef(null);
 
   const [selectedSectors, setSelectedSectors] = useState(null);
@@ -48,7 +50,7 @@ const AccountSetup = () => {
 
   const clickProvidePhotoInput = event => {
     event.preventDefault();
-    hiddenFileInput.current.click();
+    setCropperOpen(true);
   }
 
   const completeProfile = async (e) => { 
@@ -59,14 +61,7 @@ const AccountSetup = () => {
     changeUserComplete(true);
     changeProfilePicture(photoURL);
     setLoading(false);
-
     navigate('/home');
-  }
-
-  function providePhoto(e){
-    if(e.target.files[0]) {
-      setPhoto(e.target.files[0])
-    }
   }
 
   return (
@@ -82,15 +77,8 @@ const AccountSetup = () => {
                 <label className="block text-sm font-medium text-gray-700">Photo</label>
                 <div className="mt-1 flex items-center">
                   <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
-                    <img src={profilePic} alt="Avatar"/>
+                    <img src={photoPreview} alt="Avatar"/>
                   </span>
-                  <input
-                    type="file"
-                    style={{ display: 'none' }}
-                    id="contained-button-file"
-                    onChange={providePhoto}
-                    ref={hiddenFileInput}
-                  />
                   <button 
                     className='ml-4 text-sm pl-6 pr-6 pt-2 pb-2 bg-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:cursor-pointer'
                     onClick={clickProvidePhotoInput}>
@@ -127,7 +115,7 @@ const AccountSetup = () => {
               <div className="pt-3 flex justify-between items-center">
                 <div className='flex-1 flex justify-end'>
                   <button
-                      className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:bg-gray-200 disabled:text-gray-400 disabled:hover:shadow-none disabled:cursor-not-allowed"
+                      className="text-sm pl-8 pr-8 pt-2 pb-2 bg-black text-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400 hover:bg-gray-900 disabled:bg-gray-200 disabled:hover:bg-gray-200 disabled:hover:text-gray-400 disabled:text-gray-400 disabled:hover:shadow-none disabled:cursor-not-allowed"
                       type="submit" 
                       onClick={completeProfile}
                       disabled={(selectedStages === null || selectedStages.length === 0) || (selectedSectors === null || selectedSectors.length === 0 ) }
@@ -154,6 +142,13 @@ const AccountSetup = () => {
           <p className='text-gray-500'>User: {user.email}</p>
         </div>
       </div>
+      <AvatarCropperModal 
+        modalOpen={[cropperOpen, setCropperOpen]}
+        profilePic={null}
+        setPhotoPreview={setPhotoPreview}
+        setProfileChanged={setProfileChanged}
+        setPhoto={setPhoto}
+      />
     </div>
     
   )

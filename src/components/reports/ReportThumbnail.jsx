@@ -1,29 +1,41 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { UserAuth } from '../../context/AuthContext'
 
-const ReportThumbnail = () => {
+const ReportThumbnail = (props) => {
+
+  const {getValueLabel} = UserAuth();
+
   return (
-    <NavLink className="overflow-hidden bg-white shadow-sm rounded-md border border-gray-300 hover:shadow-md hover:border-gray-400">
-      <div className="px-4 py-3 sm:px-6">
-        <h3 className="text-lg font-medium leading-6 text-gray-900">Betterverse</h3>
+    <Link to='/specificreport'>
+      <div className="overflow-hidden bg-white shadow-sm rounded-md border border-gray-300 hover:shadow-md hover:border-gray-400">
+        <div className="px-4 py-3 sm:px-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">{props.name}</h3>
+        </div>
+        <div className="border-t border-gray-200">
+          <dl>
+            <div className="px-4 py-3 grid sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Rating</dt>
+              <dd className="flex items-center mt-1 text-xs font-small text-white  sm:mt-0">
+                {getValueLabel('rating', props.rating)}
+              </dd>  
+            </div>
+            <div className=" px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Stage</dt>
+              <dd className="flex items-center mt-1 text-xs font-small text-white  sm:mt-0">
+                {getValueLabel('stage', props.stage)}
+              </dd>  
+            </div>
+            <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Sectors</dt>
+              <dd className="flex items-center mt-1 text-xs font-small text-white  sm:mt-0">
+                  {getValueLabel('sectors', props.sectors)}
+              </dd>            
+            </div>
+          </dl>
+        </div>
       </div>
-      <div className="border-t border-gray-200">
-        <dl>
-          <div className="px-4 py-3 grid sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Rating</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">A*</dd>
-          </div>
-          <div className=" px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Some Metric</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">---</dd>
-          </div>
-          <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Some Metric</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-1 sm:mt-0">---</dd>
-          </div>
-        </dl>
-      </div>
-    </NavLink>
+    </Link>
   )
 }
 

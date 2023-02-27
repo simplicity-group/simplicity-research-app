@@ -368,6 +368,7 @@ const Reports = () => {
                           summary={report.summary}
                           rating={report.rating}
                           stage={report.stage}
+                          sectors={report.sectors}
                         />
                       </div>
                     ))}

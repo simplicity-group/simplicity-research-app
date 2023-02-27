@@ -2,8 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {signInWithEmailAndPassword, 
         signOut, 
         onAuthStateChanged,
+        GoogleAuthProvider, 
+        signInWithPopup
 } from 'firebase/auth'
-import { getFilters, getRequests, getReports, db, auth, getUserTokens } from '../firebase';
+import { getFilters, getRequests, getReports, getPopularReports, db, auth, getUserTokens } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore'
 
 var userstoreData = []
@@ -25,6 +27,7 @@ export const AuthContextProvider = ({ children }) => {
     var [selectedReport , setSelectedReport] = useState([])
     var [reportsLoading, setReportsLoading] = useState(true)
     var [reportsData, setReportsData] = useState([])
+    var [popularReportsData, setPopularReportsData] = useState([])
     var [onSpecificReport, setOnSpecificReport] = useState(false)
 
     var [selectedRequest , setSelectedRequest] = useState([])
@@ -39,19 +42,23 @@ export const AuthContextProvider = ({ children }) => {
             if(currentUser){
                 getCurrentUserProfile(currentUser);
                 fetchRequests(currentUser.uid)
+                fetchFilters()
+                fetchReports()
                 if(currentUser.photoURL){
                     setProfilePicture(currentUser.photoURL)
                 }
             }
         })
 
-        fetchFilters()
-        fetchReports()
-
         return () => {
             unsubscribe()
         }
     }, [])
+
+    const googleSignIn = () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+    }
 
     const signIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
@@ -105,8 +112,18 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     var fetchReports = async () => {
+        //Get all reports
         reportsData = await getReports(null);
         setReportsData(reportsData);
+
+        //Get popular reports
+        const popularReportsObj = await getPopularReports();    
+        const popularReportsNames = popularReportsObj.popularreports
+        var filteredPopularReports = reportsData.filter(function (el) {
+            return popularReportsNames.indexOf(el.name) >= 0; 
+        });
+        setPopularReportsData(filteredPopularReports)
+
         setReportsLoading(false);
     }
 
@@ -141,17 +158,42 @@ export const AuthContextProvider = ({ children }) => {
                 if(!labels){
                     return valueInput
                 }
-                return labels
+                return <span className="bg-gray-100 text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{labels}</span>       
             }
 
             //rating
             else if(group === 'rating'){
                 let ratingsMapped = filters[1].options.map(rating => { return rating.value });
                 let index = ratingsMapped.indexOf(valueInput)
+
                 if(index < 0){
                     return valueInput
                 }
-                return filters[1].options[index].label
+
+                if(filters[1].options[index].label){
+
+                    var ratingLabel = filters[1].options[index].label
+
+                    if(ratingLabel === 'Red'){
+                        return <span className="bg-red-600 text-red-100 mr-2 px-2.5 py-0.5 rounded">Red</span>
+                    }
+                    else if(ratingLabel === 'Amber/Red'){
+                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded border border-red-600">Amber/Red</span>
+                    }
+                    else if(ratingLabel == 'Amber'){
+                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded ">Amber</span>
+                    }
+                    else if(ratingLabel == 'Amber/Green'){
+                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded border border-green-600">Amber/Green</span>
+                    }
+                    else if(ratingLabel == 'Green'){
+                        return <span className="bg-green-600 text-green-100 mr-2 px-2.5 py-0.5 rounded">Green</span>
+                    }
+                    else {
+                        return filters[1].options[index].label
+                    }
+                }
+
             }
 
             //stage
@@ -161,7 +203,7 @@ export const AuthContextProvider = ({ children }) => {
                 if(index < 0){
                     return valueInput
                 }
-                return filters[2].options[index].label
+                return <span className="bg-gray-100 text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{filters[2].options[index].label}</span>       
             }
 
             //status
@@ -172,7 +214,17 @@ export const AuthContextProvider = ({ children }) => {
                     return valueInput
                 }
 
-                return filters[3].options[index].label
+                else{
+                    var label = filters[3].options[index].label
+                    if(label === 'In Progress'){
+                        return <span className="bg-yellow-500 text-white mr-2 px-2.5 py-0.5 rounded ">{filters[3].options[index].label}</span>
+                    }
+                    else if(label === 'Complete'){
+                        return <span className="bg-green-500 text-white mr-2 px-2.5 py-0.5 rounded">{filters[3].options[index].label}</span>
+                    }
+                }
+
+                return 
             }
         }
         else{
@@ -181,7 +233,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
+        <UserContext.Provider value={{user, logout, signIn, googleSignIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, popularReportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
             {children}
         </UserContext.Provider>
     );
