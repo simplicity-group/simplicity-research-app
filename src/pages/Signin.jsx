@@ -1,27 +1,44 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserAuth } from '../context/AuthContext'
 import logo from '../images/sr_logo.svg'
+import { FcGoogle } from 'react-icons/fc';
 
 const Signin = () => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [emailLoading, setEmailLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+
 
   const navigate = useNavigate();
-  const {signIn, profileComplete} = UserAuth();
+  const {signIn, googleSignIn, profileComplete} = UserAuth();
 
-  const handleSubmit = async (e) => {
+  async function handleEmailSignIn(e){
     e.preventDefault();
     setError('')
     try {
-      setLoading(true);
+      setEmailLoading(true);
       await signIn(email, password);
-      setLoading(false);
+      setEmailLoading(false);
     } catch (e) {
-      setLoading(false);
+      setEmailLoading(false);
+      setError(e.message)
+      console.log(e.message)
+    }
+  } 
+
+  async function handleGoogleSignIn(e){
+    e.preventDefault();
+    setError('')
+    try {
+      setGoogleLoading(true);
+      await googleSignIn(email, password);
+      setGoogleLoading(false);
+    } catch (e) {
+      setGoogleLoading(false);
       setError(e.message)
       console.log(e.message)
     }
@@ -34,7 +51,7 @@ const Signin = () => {
           <img className="mx-auto h-16 w-auto mt-6" src={logo} alt="SR"/>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6">
           <input type="hidden" name="remember" value="true"/>
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
@@ -48,13 +65,34 @@ const Signin = () => {
           </div>
 
           <div>
-            <button type="submit" className="group relative flex w-full justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <button type="button"
+              onClick={(e) => handleEmailSignIn(e)}
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
               </span>
-              { loading === false &&
-              <p>Sign in</p>
+              { emailLoading === false &&
+              <p>Sign in with email</p>
               }
-              { loading === true &&
+              { emailLoading === true &&
+              <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+              }
+            </button>
+
+            <button type="button"
+              onClick={(e) => handleGoogleSignIn(e)}
+              className="mt-2 group relative flex w-full justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+              </span>
+              { googleLoading === false &&
+              <FcGoogle />
+              }
+              { googleLoading === true &&
               <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -65,7 +103,10 @@ const Signin = () => {
               }
             </button>
           </div>
-          <p className='font-light text-red-700'>{error}</p>
+          { error &&
+            <p className='font-light text-red-700'>{error}</p>
+          }
+
         </form>
       </div>
     </div>

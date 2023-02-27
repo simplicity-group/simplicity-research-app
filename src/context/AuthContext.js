@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {signInWithEmailAndPassword, 
         signOut, 
         onAuthStateChanged,
+        GoogleAuthProvider, 
+        signInWithPopup
 } from 'firebase/auth'
 import { getFilters, getRequests, getReports, getPopularReports, db, auth, getUserTokens } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore'
@@ -40,19 +42,23 @@ export const AuthContextProvider = ({ children }) => {
             if(currentUser){
                 getCurrentUserProfile(currentUser);
                 fetchRequests(currentUser.uid)
+                fetchFilters()
+                fetchReports()
                 if(currentUser.photoURL){
                     setProfilePicture(currentUser.photoURL)
                 }
             }
         })
 
-        fetchFilters()
-        fetchReports()
-
         return () => {
             unsubscribe()
         }
     }, [])
+
+    const googleSignIn = () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+    }
 
     const signIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
@@ -227,7 +233,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, popularReportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
+        <UserContext.Provider value={{user, logout, signIn, googleSignIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, popularReportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
             {children}
         </UserContext.Provider>
     );
