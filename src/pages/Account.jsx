@@ -1,21 +1,17 @@
-import React, { Fragment, useContext, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext'
 import { updateUserProfile } from '../firebase';
 import Select from 'react-select';
-import AvatarImageCropper from 'react-avatar-image-cropper';
-import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import AvatarCropperModal from '../components/general/AvatarCropperModal';
 
 const Account = () => {
-
-  const [open, setOpen] = useState(true)
-
-  const cancelButtonRef = useRef(null)
 
   const {filters, user, profile, logout, profilePic, changeProfilePicture} = UserAuth();
 
   const navigate = useNavigate();
+  const [cropperOpen, setCropperOpen] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState(profilePic);
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [profileChanged, setProfileChanged] = useState(false)
@@ -34,23 +30,14 @@ const Account = () => {
     delete stageOptions[i].checked;
   }
 
-  const hiddenFileInput = React.useRef(null);
-
   const clickProvidePhotoInput = event => {
     event.preventDefault();
-    hiddenFileInput.current.click();
-  }
-
-  function providePhoto(e){
-    if(e.target.files[0]) {
-      setPhoto(e.target.files[0])
-      setProfileChanged(true);
-    }
+    setCropperOpen(true);
   }
 
   async function saveProfileChanges() {
     setLoading(true);
-    const photoURL = await updateUserProfile(user, profile, photo, selectedStages ,selectedSectors);
+    const photoURL = await updateUserProfile(user, profile, photo, selectedStages , selectedSectors);
     changeProfilePicture(photoURL);
     setLoading(false);
     setProfileChanged(false);
@@ -88,15 +75,8 @@ const Account = () => {
                 <label className="block text-sm font-medium text-gray-700">Photo</label>
                 <div className="mt-1 flex items-center">
                   <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
-                    <img src={profilePic} alt="Avatar"/>
+                    <img src={photoPreview} alt="Avatar"/>
                   </span>
-                  <input
-                    type="file"
-                    style={{ display: 'none' }}
-                    id="contained-button-file"
-                    onChange={providePhoto}
-                    ref={hiddenFileInput}
-                  />
                   <label htmlFor="contained-button-file">
                     <button className='ml-4 text-sm pl-6 pr-6 pt-2 pb-2 bg-white shadow-sm rounded-md border border-gray-400 hover:shadow-md hover:border-gray-400'
                       onClick={clickProvidePhotoInput}>
@@ -162,10 +142,16 @@ const Account = () => {
           </div>
         </form>
         <div className='m-4 pt-2 flex justify-center'>
-            <p className='text-gray-500'>User: {user.email}</p>
-          </div>
+          <p className='text-gray-500'>User: {user.email}</p>
+        </div>
       </div>
-
+      <AvatarCropperModal 
+        modalOpen={[cropperOpen, setCropperOpen]}
+        profilePic={profilePic}
+        setPhotoPreview={setPhotoPreview}
+        setProfileChanged={setProfileChanged}
+        setPhoto={setPhoto}
+      />
     </div>
   )
 }
