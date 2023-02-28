@@ -16,7 +16,6 @@ const Reports = () => {
   const [visible, setVisible] = useState(8);
   const [filteredReports, setFilteredReports] = useState(reportsData);
 
-
   useEffect(() => {
     if(!onSpecificReport){
       getReportsData();

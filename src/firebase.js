@@ -2,7 +2,7 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, updateProfile} from "firebase/auth";
 import {getDownloadURL, getStorage, ref, uploadBytes, uploadString} from "firebase/storage";
-import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import {v4} from 'uuid';
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -46,8 +46,8 @@ export async function getFilters(){
 }
 
 export async function transactTokens(cost, uid){
-  const tokensRef = doc(userstoreRef, uid, "tokens", currentYear.toString());
 
+  const tokensRef = doc(userstoreRef, uid, "tokens", currentYear.toString());
   const currentYearTokens = await getDoc(tokensRef);
   const currentYearTokensData = currentYearTokens.data()
   const currentMonthTokens = currentYearTokensData[currentMonth]
@@ -190,6 +190,27 @@ export async function updateUserTokens(uid, allTokenData){
     }
   }
   return additionalRemaining
+}
+
+export async function getReportDownloads(uid){
+  const reportDownloadRef = doc(userstoreRef, uid, "transactions", "reports");
+  const reports = await getDoc(reportDownloadRef);
+  const reportsData = reports.data();
+  if(reportsData){
+    return reportsData.downloads;
+  }
+  else{
+    return []
+  }
+}
+
+export async function saveReportDownloadTransaction(uid, reportName){
+  const reportDownloadRef = doc(userstoreRef, uid, "transactions", "reports");
+  await setDoc(reportDownloadRef, {
+      downloads: arrayUnion(reportName)
+  },
+  { merge: true }
+  );
 }
 
 export async function getUserTokens(uid){
