@@ -1,12 +1,12 @@
 import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import SRCoin from '../../images/coin.svg'
-import { transactTokens } from '../../firebase';
+import { transactTokens, saveReportDownloadTransaction, getReportDownloads } from '../../firebase';
 import { UserAuth } from '../../context/AuthContext';
 
 export default function TransactionModal(props) {
     
-  const { profile, setProfileTokens } = UserAuth();
+  const { profile, setProfileTokens, setProfileReportsDownloads } = UserAuth();
   const [modalOpen, setModalOpen] = props.modalOpen;
   const [transactionLoading, setTransactionLoading] = props.transactionLoading;
   const [errorMessage, setErrorMessage] = useState('');
@@ -18,10 +18,18 @@ export default function TransactionModal(props) {
     setTransactionLoading(true);
     
     const transactionSuccess = await transactTokens(cost, profile.id)
-    
+
     if(transactionSuccess[0] === true){
-      setProfileTokens(transactionSuccess[1])
+
+      //If this transaction is for a report download
+      if(props.transactionTitle === 'Download Report'){
+        await saveReportDownloadTransaction(profile.id, props.transactionData);
+      }
+      setProfileReportsDownloads(await getReportDownloads(profile.id));
+
+      setProfileTokens(transactionSuccess[1]);
       props.postTransactionAction();
+
       return
     } else {
       setErrorMessage('You do not have enough tokens to make this transaction.')

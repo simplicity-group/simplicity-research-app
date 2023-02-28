@@ -35,7 +35,7 @@ const Home = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-lg font-semibold text-gray-900">Request a new Report</p>
-                <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
+                <p className="mt-2 text-base leading-7 text-gray-600">Request for new projects to undergo due diligence.</p>
               </div>
           </Link>
 
@@ -51,8 +51,8 @@ const Home = () => {
               </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-lg font-semibold text-gray-900">Check status of a Report</p>
-                <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
+                <p className="text-lg font-semibold text-gray-900">View your reports</p>
+                <p className="mt-2 text-base leading-7 text-gray-600">View all completed reports, and check the status of those in process.</p>              
               </div>
           </Link>
 
@@ -73,7 +73,7 @@ const Home = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-lg font-semibold text-gray-900">Browse All Reports</p>
-                <p className="mt-2 text-base leading-7 text-gray-600">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.</p>
+                <p className="mt-2 text-base leading-7 text-gray-600">Browse the platform to see the projects that have recently been requested by other members.</p>
               </div>
           </Link>
         </dl>

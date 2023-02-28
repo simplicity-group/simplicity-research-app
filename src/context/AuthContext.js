@@ -5,7 +5,7 @@ import {signInWithEmailAndPassword,
         GoogleAuthProvider, 
         signInWithPopup
 } from 'firebase/auth'
-import { getFilters, getRequests, getReports, getPopularReports, db, auth, getUserTokens } from '../firebase';
+import { getFilters, getRequests, getReports, getPopularReports, db, auth, getUserTokens, getReportDownloads } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore'
 
 var userstoreData = []
@@ -20,6 +20,7 @@ export const AuthContextProvider = ({ children }) => {
     var [profilePic, setProfilePicture] = useState('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png')
     var [profileTokens, setProfileTokens] = useState(0)
     var [profileTokensLoading, setProfileTokensLoading] = useState(false)
+    var [profileReportsDownloads, setProfileReportsDownloads] = useState([])
 
     var [filtersLoading, setFiltersLoading] = useState(true)
     var [filters, setFilters] = useState([])
@@ -41,9 +42,10 @@ export const AuthContextProvider = ({ children }) => {
             setUser(currentUser)
             if(currentUser){
                 getCurrentUserProfile(currentUser);
-                fetchRequests(currentUser.uid)
                 fetchFilters()
                 fetchReports()
+                fetchRequests(currentUser.uid)
+                fetchReportDownloads(currentUser.uid);
                 if(currentUser.photoURL){
                     setProfilePicture(currentUser.photoURL)
                 }
@@ -143,6 +145,11 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
+    var fetchReportDownloads = async (uid) => {
+        const reportsDownloads = await getReportDownloads(uid);
+        setProfileReportsDownloads(reportsDownloads);
+    }
+
     var getValueLabel = (group, valueInput) => {
         //sectors
         if(valueInput){
@@ -233,7 +240,42 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     return (
-        <UserContext.Provider value={{user, logout, signIn, googleSignIn, getCurrentUserProfile, profile, profilePic, changeProfilePicture, userComplete, changeUserComplete, profileTokens, profileTokensLoading, setProfileTokens, filtersLoading, filters, reportsLoading, setReportsLoading, reportsData, popularReportsData, setReportsData, selectedReport, setSelectedReport, onSpecificReport, setOnSpecificReport, requestsData, setRequestsData, requestsLoading, selectedRequest, setSelectedRequest, setRequestsLoading, onSpecificRequest, setOnSpecificRequest, getValueLabel}}>
+        <UserContext.Provider value={{user, 
+                                        logout, 
+                                        signIn, 
+                                        googleSignIn, 
+                                        getCurrentUserProfile,
+                                        profile, 
+                                        profilePic, 
+                                        changeProfilePicture, 
+                                        userComplete, 
+                                        changeUserComplete, 
+                                        profileTokens, 
+                                        profileTokensLoading,
+                                        profileReportsDownloads, 
+                                        setProfileReportsDownloads,
+                                        setProfileTokens, 
+                                        filtersLoading, 
+                                        filters, 
+                                        reportsLoading, 
+                                        setReportsLoading, 
+                                        reportsData, 
+                                        popularReportsData, 
+                                        setReportsData, 
+                                        selectedReport, 
+                                        setSelectedReport, 
+                                        onSpecificReport, 
+                                        setOnSpecificReport, 
+                                        requestsData, 
+                                        setRequestsData, 
+                                        requestsLoading, 
+                                        selectedRequest, 
+                                        setSelectedRequest, 
+                                        setRequestsLoading, 
+                                        onSpecificRequest, 
+                                        setOnSpecificRequest, 
+                                        getValueLabel
+                                    }}>
             {children}
         </UserContext.Provider>
     );

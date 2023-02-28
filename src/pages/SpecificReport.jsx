@@ -6,7 +6,7 @@ import TransactionModal from '../components/general/TransactionModal';
 const SpecificReport = () => {
   const navigate = useNavigate();
 
-  var {selectedReport, setOnSpecificReport, getValueLabel} = UserAuth();
+  var {selectedReport, setOnSpecificReport, getValueLabel, profileReportsDownloads} = UserAuth();
   const [modalOpen, setModalOpen] = useState(false)
   const [transactionLoading, setTransactionLoading] = useState(false);
 
@@ -16,7 +16,12 @@ const SpecificReport = () => {
   }
 
   function handleDownload(){
-    setModalOpen(true);
+    if(profileReportsDownloads.includes(selectedReport.name)){
+      downloadReport()
+    }
+    else{
+      setModalOpen(true);
+    }
   }
 
   async function downloadReport(){
@@ -42,6 +47,7 @@ const SpecificReport = () => {
       transactionDescription="Downloading this report will transact 1 token from your account, would you like to proceed?"
       transactionCost={1}
       postTransactionAction={downloadReport}
+      transactionData={selectedReport.name}
     />
 
     <div className='p-6'>
