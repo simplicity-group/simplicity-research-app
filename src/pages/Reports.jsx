@@ -27,6 +27,7 @@ const Reports = () => {
     var reportFilters = JSON.parse(localStorage.getItem("reportFilters"));
     reportFilters.pop(1) 
     setReportFilters(reportFilters)
+
   }, [])
 
   const getReportsData = async () => {
@@ -62,26 +63,30 @@ const Reports = () => {
     let stageFilterMapped = stageFilter.map(stage => { return stage.value });
 
     //Filter for stage & rating
-    setFilteredReports(reportsData.filter(function(report){
+    var filteredR = await reportsData.filter(function(report){
 
       var reportExist = false;
       var sectorsSplit = report.sectors.split(' ');
 
       for(var sectorSplitIndex = 0; sectorSplitIndex < sectorsSplit.length; sectorSplitIndex++){
         //Check for sectors
-        if(sectorsFilterMapped.includes(sectorsSplit[sectorSplitIndex])){
-          reportExist = true;
-        }       
-      }
-      //Check for stages and rating
-      if(reportExist == false){
-        if(stageFilterMapped.includes(report.stage) || ratingFilterMapped.includes(report.rating)){
+        console.log('checking sectors')
+        if(sectorsFilterMapped.includes(sectorsSplit[sectorSplitIndex]) && stageFilterMapped.includes(report.stage) && ratingFilterMapped.includes(report.rating)){
           reportExist = true;
         }
+        else{
+          reportExist = false;
+        }       
       }
-
       return reportExist
-    }));  
+    });  
+
+    console.log(filteredR)
+
+
+   setFilteredReports(filteredR)
+
+  
 
     setReportsLoading(false);
   }
