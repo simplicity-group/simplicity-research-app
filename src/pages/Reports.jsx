@@ -69,8 +69,6 @@ const Reports = () => {
       var sectorsSplit = report.sectors.split(' ');
 
       for(var sectorSplitIndex = 0; sectorSplitIndex < sectorsSplit.length; sectorSplitIndex++){
-        //Check for sectors
-        console.log('checking sectors')
         if(sectorsFilterMapped.includes(sectorsSplit[sectorSplitIndex]) && stageFilterMapped.includes(report.stage) && ratingFilterMapped.includes(report.rating)){
           reportExist = true;
         }
@@ -81,14 +79,9 @@ const Reports = () => {
       return reportExist
     });  
 
-    console.log(filteredR)
-
-
    setFilteredReports(filteredR)
 
-  
-
-    setReportsLoading(false);
+  setReportsLoading(false);
   }
 
   const showMoreReports = () => {
