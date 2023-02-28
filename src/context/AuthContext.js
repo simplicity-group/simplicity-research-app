@@ -165,7 +165,7 @@ export const AuthContextProvider = ({ children }) => {
                 if(!labels){
                     return valueInput
                 }
-                return <span className="bg-gray-100 text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{labels}</span>       
+                return <span className="text-white mr-2 px-2.5 py-0.5 rounded bg-gray-700">{labels}</span>       
             }
 
             //rating
@@ -210,7 +210,7 @@ export const AuthContextProvider = ({ children }) => {
                 if(index < 0){
                     return valueInput
                 }
-                return <span className="bg-gray-100 text-white mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{filters[2].options[index].label}</span>       
+                return <span className="text-white mr-2 px-2.5 py-0.5 rounded bg-gray-700">{filters[2].options[index].label}</span>       
             }
 
             //status
