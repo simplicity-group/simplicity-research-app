@@ -8,7 +8,7 @@ import SRCoin from '../../images/coin.svg'
 
 const navigation = [
   { name: 'Reports', href: '/reports', current: false },
-  { name: 'Requests', href: '/requests', current: false },
+  { name: 'My Reports', href: '/requests', current: false },
 ]
 
 function classNames(...classes) {
