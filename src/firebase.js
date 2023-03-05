@@ -2,7 +2,7 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, updateProfile} from "firebase/auth";
 import {getDownloadURL, getStorage, ref, uploadBytes, uploadString} from "firebase/storage";
-import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, doc, addDoc, updateDoc, setDoc, arrayUnion, orderBy } from 'firebase/firestore';
 import {v4} from 'uuid';
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -264,7 +264,11 @@ export async function getReports(){
         return (report.name !== '' && report.name !== null && report.rating !== '' && report.rating !== null)
     });
 
-    return filteredReports
+    const sortedDesc = filteredReports.sort(
+      (objA, objB) => Number(objB.created) - Number(objA.created),
+    );
+
+    return sortedDesc
 }
 
 export async function getPopularReports(){

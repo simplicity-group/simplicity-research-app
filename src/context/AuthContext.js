@@ -182,19 +182,19 @@ export const AuthContextProvider = ({ children }) => {
                     var ratingLabel = filters[1].options[index].label
 
                     if(ratingLabel === 'Red'){
-                        return <span className="bg-red-600 text-red-100 mr-2 px-2.5 py-0.5 rounded">Red</span>
+                        return <span className="bg-red-600 text-white mr-2 px-2.5 py-0.5 rounded">Red</span>
                     }
                     else if(ratingLabel === 'Amber/Red'){
-                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded border border-red-600">Amber/Red</span>
+                        return <span className="bg-gradient-to-b from-yellow-500 to-red-600 text-white mr-2 px-2.5 py-0.5 rounded">Amber/Red</span>
                     }
                     else if(ratingLabel == 'Amber'){
-                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded ">Amber</span>
+                        return <span className="bg-yellow-600 text-white mr-2 px-2.5 py-0.5 rounded ">Amber</span>
                     }
                     else if(ratingLabel == 'Amber/Green'){
-                        return <span className="bg-yellow-600 text-yellow-100 mr-2 px-2.5 py-0.5 rounded border border-green-600">Amber/Green</span>
+                        return <span className="bg-gradient-to-b from-yellow-500 to-green-600 text-white mr-2 px-2.5 py-0.5 rounded ">Amber/Green</span>
                     }
                     else if(ratingLabel == 'Green'){
-                        return <span className="bg-green-600 text-green-100 mr-2 px-2.5 py-0.5 rounded">Green</span>
+                        return <span className="bg-green-600 text-white mr-2 px-2.5 py-0.5 rounded">Green</span>
                     }
                     else {
                         return filters[1].options[index].label
