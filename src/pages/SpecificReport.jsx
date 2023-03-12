@@ -44,7 +44,7 @@ const SpecificReport = () => {
       modalOpen={[modalOpen, setModalOpen]} 
       transactionLoading={[transactionLoading, setTransactionLoading]}
       transactionTitle="Download Report"
-      transactionDescription="Downloading this report will transact 1 token from your account, would you like to proceed?"
+      transactionDescription="Downloading this report will transact 1 credit from your account, would you like to proceed?"
       transactionCost={1}
       postTransactionAction={downloadReport}
       transactionData={selectedReport.name}

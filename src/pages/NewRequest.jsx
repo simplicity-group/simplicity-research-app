@@ -48,7 +48,7 @@ const NewRequest = () => {
           modalOpen={[modalOpen, setModalOpen]}
           transactionLoading={[transactionLoading, setTransactionLoading]}
           transactionTitle="New Request"
-          transactionDescription="Making a new request will transact 2 tokens from your account, would you like to proceed?"
+          transactionDescription="Making a new request will transact 2 credits from your account, would you like to proceed?"
           transactionCost={2}
           postTransactionAction={callSubmitRequest}
         />
@@ -130,7 +130,7 @@ const NewRequest = () => {
                 </div>
                 <div className="pt-3 flex justify-between items-center">
                   <div className="mt-2 flex items-center text-sm text-gray-500">
-                    Submitting a new request will transact 2 tokens from your account.
+                    Submitting a new request will transact 2 credits from your account.
                   </div>
                   <div className='flex-1 flex justify-end'>
                     <button type="button"

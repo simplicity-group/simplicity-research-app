@@ -32,7 +32,7 @@ export default function TransactionModal(props) {
 
       return
     } else {
-      setErrorMessage('You do not have enough tokens to make this transaction.')
+      setErrorMessage('You do not have enough credits to make this transaction.')
       setTransactionLoading(false);
       return
     }
